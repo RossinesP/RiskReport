@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Risk report</string>
+    <string name="label_description">Risk description</string>
+    <string name="label_evaluation">Risk evaluation</string>
+    <string name="number_employees">Number of employees at risk</string>
+    <string name="number_users">Number of users at risk</string>
+    <string name="number_third">Number of third parties at risk</string>
+    <string name="possible_wound">Potential resulting injuries</string>
+    <string name="possible_sickness">Potential resulting diseases</string>
+    <string name="physical_hardness">Resulting physical hardness</string>
+    <string name="mental_hardness">Resulting Mental hardness</string>
+    <string name="risk_probability">Probability</string>
+    <string name="solution_simplicity">Fixing ease</string>
+    <string name="solution_cost">Fixing cost</string>
+    <string name="work_unit">Working unit</string>
+    <string name="work_place">Location</string>
+    <string name="risk_description">Risk description</string>
+    <string name="picture_taken">Picture saved</string>
+    <string name="report_sent">Report sent</string>
+    <string name="report_sending_chooser">Send the report</string>
+    <string name="report_subject">Risk report</string>
+    <string name="empty_value">(Empty)</string>
+    <string name="new_report">Create a new report</string>
+    <string name="risk_name">Risk name</string>
+
+    <string name="cat_description">Description</string>
+    <string name="cat_targets">Targets</string>
+    <string name="cat_risks">Risks</string>
+    <string name="cat_fix">Fix</string>
+
+    <string name="delete_report">Delete</string>
+    <string name="toast_report_deleted">Report deleted</string>
+    <string name="menu_createreport">New report</string>
+    <string name="reportlist_empty">Click on image to create a new report</string>
+    <string name="select_all">Select all</string>
+    <string name="items_selected">%nb items selected</string>
+    <string name="add_picture">Add a picture</string>
+    <string name="toast_image_deleted">Picture(s) deleted</string>
+
+</resources>

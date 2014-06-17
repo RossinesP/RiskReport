@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Rapport de risque</string>
+    <string name="label_description">Description du risque</string>
+    <string name="label_evaluation">Evaluation du risque</string>
+    <string name="number_employees">Nombre d\'employés concernés</string>
+    <string name="number_users">Nombre d\'usagers concernés</string>
+    <string name="number_third">Nombre de tiers concernés</string>
+    <string name="possible_wound">Blessures potentielles induites</string>
+    <string name="possible_sickness">Maladies potentielles induites</string>
+    <string name="physical_hardness">Pénibilité physique</string>
+    <string name="mental_hardness">Pénibilité mentale</string>
+    <string name="risk_probability">Probabilité</string>
+    <string name="solution_simplicity">Simplicité de la solution</string>
+    <string name="solution_cost">Coût de la solution</string>
+    <string name="work_unit">Unité de travail</string>
+    <string name="work_place">Localisation</string>
+    <string name="risk_description">Description du risque</string>
+    <string name="picture_taken">Photo enregistrée</string>
+    <string name="report_sent">Rapport envoyé</string>
+    <string name="report_sending_chooser">Envoyer le rapport</string>
+    <string name="report_subject">Rapport de Risque</string>
+    <string name="empty_value">(Vide)</string>
+    <string name="new_report">Create a new report</string>
+    <string name="risk_name">Nom du rapport</string>
+
+    <string name="cat_description">Description</string>
+    <string name="cat_targets">Cibles</string>
+    <string name="cat_risks">Risques</string>
+    <string name="cat_fix">Solution</string>
+
+    <string name="delete_report">Supprimer</string>
+    <string name="toast_report_deleted">Rapport supprimé</string>
+    <string name="menu_createreport">Nouveau rapport</string>
+    <string name="reportlist_empty">Cliquez sur image pour créer un nouveau rapport</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="items_selected">%nb items sélectionnés</string>
+    <string name="add_picture">Ajouter une photo</string>
+    <string name="toast_image_deleted">Photo(s) supprimée</string>
+</resources>
