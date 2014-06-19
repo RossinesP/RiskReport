@@ -133,7 +133,7 @@ public class PicturesFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        mPicturesUpdatedListener.updateData(mPicturesAdapter.getItems());
+        mPicturesUpdatedListener.updateData(mPicturesAdapter.getItems(), false);
     }
 
     private void deleteSelectedItems() {
@@ -150,7 +150,7 @@ public class PicturesFragment extends Fragment {
         newPictureList.addAll(mPicturesAdapter.getItems());
         newPictureList.removeAll(deletePictureList);
 
-        mPicturesUpdatedListener.updateData(newPictureList);
+        mPicturesUpdatedListener.updateData(newPictureList, true);
     }
 
     private void selectAll() {
@@ -180,6 +180,6 @@ public class PicturesFragment extends Fragment {
     }
 
     public interface OnPictureUpdatedListener {
-        public void updateData(ArrayList<String> picturesList);
+        public void updateData(ArrayList<String> picturesList, boolean updateReport);
     }
 }

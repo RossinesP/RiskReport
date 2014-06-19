@@ -220,9 +220,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     }
 
     @Override
-    public void updateData(ArrayList<String> picturesList) {
+    public void updateData(ArrayList<String> picturesList, boolean updateReport) {
         mReport.pictures.clear();
         mReport.pictures.addAll(picturesList);
+        if (updateReport) setReport(mReport);
     }
 
     @Override
