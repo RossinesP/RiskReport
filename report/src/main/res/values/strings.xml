@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">Risk report</string>
-    <string name="label_description">Risk description</string>
-    <string name="label_evaluation">Risk evaluation</string>
+    <string name="label_description">Description</string>
+    <string name="label_pictures">Pictures</string>
     <string name="number_employees">Number of employees at risk</string>
     <string name="number_users">Number of users at risk</string>
     <string name="number_third">Number of third parties at risk</string>

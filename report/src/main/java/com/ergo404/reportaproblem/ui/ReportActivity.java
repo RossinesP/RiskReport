@@ -1,12 +1,18 @@
 package com.ergo404.reportaproblem.ui;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,8 +43,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     private Uri mPictureToAdd;
 
     private final File mReportFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "RiskReport");
-    private DescriptionFragment mDescriptionFragment;
-    private PicturesFragment mPicturesFragment;
+
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
+
 
     private class LoadReportTask extends AsyncTask<Long, Void, Report> {
         @Override
@@ -121,10 +129,52 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-        mReport = new Report();
 
-        mDescriptionFragment = (DescriptionFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_description);
-        mPicturesFragment = (PicturesFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_pictures);
+        final ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        mReport = new Report();
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                getActionBar().setSelectedNavigationItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                mPager.setCurrentItem(tab.getPosition());
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        actionBar.addTab(actionBar.newTab()
+                .setText(R.string.label_description)
+                .setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab()
+                .setText(R.string.label_pictures)
+                .setTabListener(tabListener));
+
         loadReport(savedInstanceState);
     }
 
@@ -246,8 +296,8 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         Log.v(TAG, "setReport called with id " + report.sqlId);
         mReport = report;
         getActionBar().setTitle(mReport.riskName);
-        mDescriptionFragment.setReport(mReport);
-        mPicturesFragment.setReport(mReport);
+        ((DescriptionFragment) mPagerAdapter.getItem(0)).setReport(mReport);
+        ((PicturesFragment) mPagerAdapter.getItem(1)).setReport(mReport);
 
         if (mPictureToAdd != null) {
             mReport.pictures.add(mPictureToAdd.toString());
@@ -294,5 +344,50 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         );
 
         return image;
+    }
+
+    public class PagerAdapter extends FragmentPagerAdapter {
+
+        private PicturesFragment mPicturesFragment;
+        private DescriptionFragment mDescriptionFragment;
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    if (mDescriptionFragment == null) {
+                        mDescriptionFragment = new DescriptionFragment();
+                    }
+                    return mDescriptionFragment;
+                case 1:
+                    if (mPicturesFragment == null) {
+                        mPicturesFragment = new PicturesFragment();
+                    }
+                    return mPicturesFragment;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return getString(R.string.label_description);
+                case 1:
+                    return getString(R.string.label_pictures);
+                default:
+                    return "";
+            }
+        }
     }
 }

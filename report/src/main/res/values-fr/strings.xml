@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">Rapport de risque</string>
-    <string name="label_description">Description du risque</string>
-    <string name="label_evaluation">Evaluation du risque</string>
+    <string name="label_description">Description</string>
+    <string name="label_pictures">Photos</string>
     <string name="number_employees">Nombre d\'employés concernés</string>
     <string name="number_users">Nombre d\'usagers concernés</string>
     <string name="number_third">Nombre de tiers concernés</string>
