@@ -20,5 +20,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v13:19.+'
+    compile 'com.nhaarman.listviewanimations:library:2.6.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

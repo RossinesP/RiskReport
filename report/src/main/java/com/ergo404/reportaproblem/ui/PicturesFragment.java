@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.ui.adapters.PictureListAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,29 +35,26 @@ public class PicturesFragment extends Fragment {
     private GridView mGridView;
     private PictureListAdapter mPicturesAdapter;
     private OnPictureUpdatedListener mPicturesUpdatedListener;
+    private AnimateDismissAdapter mAnimateDismissAdapter;
 
-    private class DeletePictureTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
+    private class DeletePictureTask extends AsyncTask<String, Void, Boolean> {
 
         @Override
-        protected ArrayList<String> doInBackground(ArrayList<String>... params) {
-            ArrayList<String> deletedPictures = new ArrayList<String>();
-            for (String picture : params[0]) {
-                Log.i(TAG, "Deleting picture " + Uri.parse(picture).getPath());
-                File pictureF = new File(Uri.parse(picture).getPath());
-                if (pictureF.delete()) {
-                    deletedPictures.add(picture);
-                } else {
-                    Log.e(TAG, "Could not delete picture " + Uri.parse(picture).getPath());
-                }
+        protected Boolean doInBackground(String... params) {
+            String path = params[0];
+            Log.i(TAG, "Deleting picture " + Uri.parse(path).getPath());
+            File pictureF = new File(Uri.parse(path).getPath());
+            boolean result = pictureF.delete();
+            if (!result) {
+                Log.e(TAG, "Could not delete picture " + Uri.parse(path).getPath());
             }
-
-            return deletedPictures;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String> deleted) {
+        protected void onPostExecute(Boolean deleted) {
             super.onPostExecute(deleted);
-            if (deleted.size() > 0) {
+            if (deleted) {
                 Toast.makeText(getActivity(), getString(R.string.toast_image_deleted), Toast.LENGTH_SHORT).show();
             }
         }
@@ -88,7 +87,23 @@ public class PicturesFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.v(TAG, "onActivityCreated");
         mPicturesAdapter = new PictureListAdapter(getActivity());
-        mGridView.setAdapter(mPicturesAdapter);
+        OnDismissCallback mDismissCallback = new OnDismissCallback() {
+            @Override
+            public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+                for (int position: reverseSortedPositions) {
+                    final String picturePath = (String) mPicturesAdapter.getItem(position);
+                    listView.getChildAt(position).setMinimumHeight(300);
+                    mPicturesAdapter.remove(position);
+                    new DeletePictureTask().execute(picturePath);
+                }
+
+                mPicturesUpdatedListener.updateData(mPicturesAdapter.getItems(), true);
+            }
+        };
+        mAnimateDismissAdapter = new AnimateDismissAdapter(mPicturesAdapter, mDismissCallback);
+        mAnimateDismissAdapter.setAbsListView(mGridView);
+
+        mGridView.setAdapter(mAnimateDismissAdapter);
         mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         mGridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
@@ -138,19 +153,13 @@ public class PicturesFragment extends Fragment {
 
     private void deleteSelectedItems() {
         SparseBooleanArray checkedItems = mGridView.getCheckedItemPositions();
-        ArrayList<String> deletePictureList = new ArrayList<String>();
+        ArrayList<Integer> deletePictureList = new ArrayList<Integer>();
         for (int i = 0; i < mPicturesAdapter.getCount(); i++) {
             if (checkedItems.get(i, false)) {
-                deletePictureList.add((String) mPicturesAdapter.getItem(i));
+                deletePictureList.add(i);
             }
         }
-        new DeletePictureTask().execute(deletePictureList);
-
-        ArrayList<String> newPictureList = new ArrayList<String>();
-        newPictureList.addAll(mPicturesAdapter.getItems());
-        newPictureList.removeAll(deletePictureList);
-
-        mPicturesUpdatedListener.updateData(newPictureList, true);
+        mAnimateDismissAdapter.animateDismiss(deletePictureList);
     }
 
     private void selectAll() {

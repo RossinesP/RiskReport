@@ -1,277 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
     <LinearLayout
-        android:id="@+id/descriptionHeaderLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/expand_description"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_action_expand"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/cat_description"
-            style="@android:style/TextAppearance.Holo.Medium"
-            tools:text="Description"
-            />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/descriptionLayoutFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/description_background">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/descriptionLayout"
+            android:id="@+id/descriptionHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppTheme.DescriptionDetails">
-            <EditText
-                android:id="@+id/risk_name"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/expand_description"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_action_expand"/>
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                android:hint="@string/risk_name"/>
-
-            <EditText
-                android:id="@+id/problem_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minLines="3"
-                android:maxLines="4"
-                android:hint="@string/risk_description"/>
-
-            <EditText
-                android:id="@+id/work_unit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                android:hint="@string/work_unit"/>
-
-            <EditText
-                android:id="@+id/work_place"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                android:hint="@string/work_place"/>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/cat_description"
+                style="@android:style/TextAppearance.Holo.Medium"
+                tools:text="Description"
+                />
         </LinearLayout>
-    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/targetsHeaderLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/expand_targets"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_action_expand"/>
-        <TextView
+        <FrameLayout
+            android:id="@+id/descriptionLayoutFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/cat_targets"
-            style="@android:style/TextAppearance.Holo.Medium"
-            tools:text="Targets"
-            />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:background="@drawable/description_background">
 
-    <FrameLayout
-        android:id="@+id/targetsLayoutFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/description_background">
+            <LinearLayout
+                android:id="@+id/descriptionLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AppTheme.DescriptionDetails">
+                <EditText
+                    android:id="@+id/risk_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:hint="@string/risk_name"/>
+
+                <EditText
+                    android:id="@+id/problem_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="3"
+                    android:maxLines="4"
+                    android:hint="@string/risk_description"/>
+
+                <EditText
+                    android:id="@+id/work_unit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:hint="@string/work_unit"/>
+
+                <EditText
+                    android:id="@+id/work_place"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:hint="@string/work_place"/>
+            </LinearLayout>
+        </FrameLayout>
+
         <LinearLayout
-            android:id="@+id/targetsLayout"
+            android:id="@+id/targetsHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppTheme.DescriptionDetails">
-
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/expand_targets"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_action_expand"/>
             <TextView
-                android:id="@+id/employees_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/number_employees"/>
-            <SeekBar
-                android:id="@+id/employees_risk_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/users_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/number_users"/>
-            <SeekBar
-                android:id="@+id/users_risk_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/third_party_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/number_third"/>
-            <SeekBar
-                android:id="@+id/third_party_risk_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/cat_targets"
+                style="@android:style/TextAppearance.Holo.Medium"
+                tools:text="Targets"
+                />
         </LinearLayout>
-    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/risksHeaderLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/expand_risks"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_action_expand"/>
-        <TextView
+        <FrameLayout
+            android:id="@+id/targetsLayoutFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/cat_risks"
-            style="@android:style/TextAppearance.Holo.Medium"
-            />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:background="@drawable/description_background">
+            <LinearLayout
+                android:id="@+id/targetsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AppTheme.DescriptionDetails">
 
-    <FrameLayout
-        android:id="@+id/risksLayoutFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/description_background">
+                <TextView
+                    android:id="@+id/employees_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/number_employees"/>
+                <SeekBar
+                    android:id="@+id/employees_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+
+                <TextView
+                    android:id="@+id/users_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/number_users"/>
+                <SeekBar
+                    android:id="@+id/users_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+
+                <TextView
+                    android:id="@+id/third_party_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/number_third"/>
+                <SeekBar
+                    android:id="@+id/third_party_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+            </LinearLayout>
+        </FrameLayout>
+
         <LinearLayout
-            android:id="@+id/risksLayout"
+            android:id="@+id/risksHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppTheme.DescriptionDetails">
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/expand_risks"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_action_expand"/>
             <TextView
-                android:id="@+id/wound_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/possible_wound"/>
-            <SeekBar
-                android:id="@+id/wound_risk_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/sickness_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/possible_sickness"/>
-            <SeekBar
-                android:id="@+id/sickness_risk_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/physical_hardness_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/physical_hardness"/>
-            <SeekBar
-                android:id="@+id/physical_hardness_risk_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/mental_hardness_risk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mental_hardness"/>
-            <SeekBar
-                android:id="@+id/mental_hardness_risk_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/probability"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/risk_probability"/>
-            <SeekBar
-                android:id="@+id/probability_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/cat_risks"
+                style="@android:style/TextAppearance.Holo.Medium"
+                />
         </LinearLayout>
-    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/fixHeaderLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/expand_fix"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_action_expand"/>
-        <TextView
+        <FrameLayout
+            android:id="@+id/risksLayoutFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/cat_fix"
-            style="@android:style/TextAppearance.Holo.Medium"
-            />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:background="@drawable/description_background">
+            <LinearLayout
+                android:id="@+id/risksLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AppTheme.DescriptionDetails">
+                <TextView
+                    android:id="@+id/wound_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/possible_wound"/>
+                <SeekBar
+                    android:id="@+id/wound_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
 
-    <FrameLayout
-        android:id="@+id/fixLayoutFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/description_background">
+                <TextView
+                    android:id="@+id/sickness_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/possible_sickness"/>
+                <SeekBar
+                    android:id="@+id/sickness_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+
+                <TextView
+                    android:id="@+id/physical_hardness_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/physical_hardness"/>
+                <SeekBar
+                    android:id="@+id/physical_hardness_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+
+                <TextView
+                    android:id="@+id/mental_hardness_risk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mental_hardness"/>
+                <SeekBar
+                    android:id="@+id/mental_hardness_risk_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+
+                <TextView
+                    android:id="@+id/probability"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/risk_probability"/>
+                <SeekBar
+                    android:id="@+id/probability_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+            </LinearLayout>
+        </FrameLayout>
+
         <LinearLayout
-            android:id="@+id/fixLayout"
+            android:id="@+id/fixHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/AppTheme.DescriptionDetails">
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/expand_fix"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_action_expand"/>
             <TextView
-                android:id="@+id/repair_easiness"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/solution_simplicity"/>
-            <SeekBar
-                android:id="@+id/repair_easiness_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
-
-            <TextView
-                android:id="@+id/repair_cost"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/solution_cost"/>
-            <SeekBar
-                android:id="@+id/repair_cost_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/AppTheme.Seekbar"/>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/cat_fix"
+                style="@android:style/TextAppearance.Holo.Medium"
+                />
         </LinearLayout>
-    </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/fixLayoutFrame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/description_background">
+            <LinearLayout
+                android:id="@+id/fixLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AppTheme.DescriptionDetails">
+                <TextView
+                    android:id="@+id/repair_easiness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/solution_simplicity"/>
+                <SeekBar
+                    android:id="@+id/repair_easiness_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/repair_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/solution_cost"/>
+                <SeekBar
+                    android:id="@+id/repair_cost_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AppTheme.Seekbar"/>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</ScrollView>
