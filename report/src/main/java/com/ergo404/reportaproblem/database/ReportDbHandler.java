@@ -94,6 +94,15 @@ public class ReportDbHandler {
         return affected > 0;
     }
 
+    public boolean deleteReports(ArrayList<Long> reportsIds) {
+        boolean result = true;
+        for (Long sqlId : reportsIds) {
+            result &= deleteReport(sqlId);
+        }
+        return result;
+    }
+
+
     public ArrayList<Report> getReports() {
         openDatabase();
 

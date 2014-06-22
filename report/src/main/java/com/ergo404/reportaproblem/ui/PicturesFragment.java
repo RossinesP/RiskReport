@@ -170,7 +170,7 @@ public class PicturesFragment extends Fragment {
 
     private void updateCABTitle(ActionMode mode) {
         int checkedItemCount = mGridView.getCheckedItemCount();
-        String selectedItems = getString(R.string.items_selected);
+        String selectedItems = getString(R.string.pictures_selected);
         selectedItems = selectedItems.replace("%nb", String.valueOf(checkedItemCount));
         mode.setTitle(selectedItems);
 

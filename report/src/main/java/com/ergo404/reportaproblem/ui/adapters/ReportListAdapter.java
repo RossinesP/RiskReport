@@ -34,6 +34,11 @@ public class ReportListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void remove(int position) {
+        mReportsList.remove(position);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return mReportsList.size();

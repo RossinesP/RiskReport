@@ -31,11 +31,13 @@
     <string name="cat_fix">Fix</string>
 
     <string name="delete_report">Delete</string>
-    <string name="toast_report_deleted">Report deleted</string>
+    <string name="toast_report_deleted">Report(s) deleted</string>
     <string name="menu_createreport">New report</string>
     <string name="reportlist_empty">Click on image to create a new report</string>
     <string name="select_all">Select all</string>
     <string name="items_selected">%nb items selected</string>
+    <string name="reports_selected">%nb report(s) selected</string>
+    <string name="pictures_selected">%nb picture(s) selected</string>
     <string name="add_picture">Add a picture</string>
     <string name="toast_image_deleted">Picture(s) deleted</string>
 

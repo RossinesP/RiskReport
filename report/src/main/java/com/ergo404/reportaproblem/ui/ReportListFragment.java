@@ -26,6 +26,8 @@ import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.ui.adapters.ReportListAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
 import java.util.ArrayList;
 
@@ -51,12 +53,12 @@ public class ReportListFragment extends ListFragment {
         }
     }
 
-    private class DeleteReportTask extends AsyncTask<Long, Void, Boolean> {
+    private class DeleteReportTask extends AsyncTask<ArrayList<Long>, Void, Boolean> {
 
         @Override
-        protected Boolean doInBackground(Long... params) {
+        protected Boolean doInBackground(ArrayList<Long>... params) {
             ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());
-            boolean result = handler.deleteReport(params[0]);
+            boolean result = handler.deleteReports(params[0]);
             handler.closeDatabase();
             return result;
         }
@@ -73,6 +75,7 @@ public class ReportListFragment extends ListFragment {
     }
 
     private ReportListAdapter mAdapter;
+    private AnimateDismissAdapter mDismissAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,7 +118,20 @@ public class ReportListFragment extends ListFragment {
         if (mAdapter == null) {
             mAdapter = new ReportListAdapter(getActivity());
         }
-        setListAdapter(mAdapter);
+        mDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnDismissCallback() {
+            @Override
+            public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+                ArrayList<Long> deleteSqlIds = new ArrayList<Long>();
+                for (int position : reverseSortedPositions) {
+                    deleteSqlIds.add(((Report) mAdapter.getItem(position)).sqlId);
+                    mAdapter.remove(position);
+                }
+                new DeleteReportTask().execute(deleteSqlIds);
+            }
+        });
+        mDismissAdapter.setAbsListView(getListView());
+        setListAdapter(mDismissAdapter);
+
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setSelector(android.R.color.darker_gray);
         getListView().setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -153,7 +169,7 @@ public class ReportListFragment extends ListFragment {
 
             private void updateCABTitle(ActionMode mode) {
                 int checkedItemCount = getListView().getCheckedItemCount();
-                String selectedItems = getString(R.string.items_selected);
+                String selectedItems = getString(R.string.reports_selected);
                 selectedItems = selectedItems.replace("%nb", String.valueOf(checkedItemCount));
                 mode.setTitle(selectedItems);
 
@@ -190,11 +206,14 @@ public class ReportListFragment extends ListFragment {
 
     private void deleteSelectedItems() {
         SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+        ArrayList<Integer> deleteList = new ArrayList<Integer>();
         for (int i = 0; i < mAdapter.getCount(); i++) {
             if (checkedItems.get(i, false)) {
-                new DeleteReportTask().execute(((Report)mAdapter.getItem(i)).sqlId);
+                deleteList.add(i);
             }
         }
+
+        mDismissAdapter.animateDismiss(deleteList);
     }
 
     @Override
