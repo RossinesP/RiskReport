@@ -49,14 +49,12 @@ public class PictureListAdapter extends BaseAdapter {
     }
 
     public void updatePictures(ArrayList<String> newPictures) {
-        Log.v(TAG, "updatePictutes called with " + newPictures.size() + " items");
         mPictures.clear();
         mPictures.addAll(newPictures);
         notifyDataSetChanged();
     }
 
     public void remove(int position) {
-        Log.v(TAG, "remove called for item " + position);
         mBitmapCache.remove(mPictures.get(position));
         mPictures.remove(position);
         notifyDataSetChanged();
@@ -82,7 +80,6 @@ public class PictureListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.v(TAG, "getView called for item " + position);
         ViewHolder holder;
         if (convertView == null || convertView.getLayoutParams().height == 0) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.picture_item, parent, false);
@@ -119,7 +116,6 @@ public class PictureListAdapter extends BaseAdapter {
                 }
             });
         }
-        Log.v(TAG, "convertView height : " + convertView.getHeight());
         return convertView;
     }
 

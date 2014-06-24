@@ -2,8 +2,11 @@ package com.ergo404.reportaproblem.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.ergo404.reportaproblem.Report;
 
@@ -13,16 +16,20 @@ import java.util.ArrayList;
  * Created by pierrerossines on 08/06/2014.
  */
 public class ReportDbHandler {
-
+    public final static String INTENT_DB_CHANGED = "db_changed";
+    private final static String TAG = ReportDbHandler.class.getSimpleName();
     private static ReportDbHandler sInstance;
 
     private Context mContext;
     private ReportDbHelper mHelper;
     private SQLiteDatabase mDb;
 
+    private LocalBroadcastManager mBroadcastMgr;
+
     private ReportDbHandler(Context context) {
         mContext = context;
         mHelper = new ReportDbHelper(context);
+        mBroadcastMgr = LocalBroadcastManager.getInstance(context);
     }
 
     public static ReportDbHandler getInstance(Context context) {
@@ -91,13 +98,19 @@ public class ReportDbHandler {
 
         int affected = mDb.delete(ReportDbHelper.TABLE_REPORTS, ReportDbHelper.KEY_ID + "=?",
                 new String[] { String.valueOf(sqlId) });
-        return affected > 0;
+
+        boolean reportsDeleted = affected > 0;
+        if (reportsDeleted) {
+            notifyDbChanged();
+        }
+        return reportsDeleted;
     }
 
     public boolean deleteReports(ArrayList<Long> reportsIds) {
         boolean result = true;
         for (Long sqlId : reportsIds) {
             result &= deleteReport(sqlId);
+            if (result) Log.v(TAG, "Deleted report " + sqlId);
         }
         return result;
     }
@@ -172,17 +185,26 @@ public class ReportDbHandler {
         cv.put(ReportDbHelper.KEY_PICTURESLIST, picturesList);
 
         cv.put(ReportDbHelper.KEY_RISK_DATE, (report.date != -1) ? report.date : System.currentTimeMillis());
-        long result = report.sqlId;
+        long result = -1;
         if (report.sqlId == -1) {
             result = mDb.insert(ReportDbHelper.TABLE_REPORTS, null, cv);
         } else {
-            result = mDb.update(ReportDbHelper.TABLE_REPORTS, cv,
+            long affected = mDb.update(ReportDbHelper.TABLE_REPORTS, cv,
                     ReportDbHelper.KEY_ID + "=?",
                     new String[] {
                         String.valueOf(report.sqlId)
                     });
+            result = (affected > 0) ? report.sqlId : -1;
         }
 
+        if (result != -1) {
+            notifyDbChanged();
+        }
         return result;
+    }
+
+    private void notifyDbChanged() {
+        Intent notif = new Intent(INTENT_DB_CHANGED);
+        mBroadcastMgr.sendBroadcast(notif);
     }
 }

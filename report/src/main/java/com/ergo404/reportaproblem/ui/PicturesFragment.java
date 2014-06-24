@@ -34,7 +34,6 @@ public class PicturesFragment extends Fragment {
     private final static String TAG = PicturesFragment.class.getSimpleName();
     private GridView mGridView;
     private PictureListAdapter mPicturesAdapter;
-    private OnPictureUpdatedListener mPicturesUpdatedListener;
     private AnimateDismissAdapter mAnimateDismissAdapter;
 
     private class DeletePictureTask extends AsyncTask<String, Void, Boolean> {
@@ -75,9 +74,15 @@ public class PicturesFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mPicturesUpdatedListener = (OnPictureUpdatedListener) activity;
+            OnPictureUpdatedListener listener = (OnPictureUpdatedListener) activity;
         } catch (ClassCastException cce) {
             Log.v(TAG, "Parent activity must implement OnPictureUpdatedListener");
+            cce.printStackTrace();
+        }
+        try {
+            ReportProvider provider = (ReportProvider) activity;
+        } catch (ClassCastException cce) {
+            Log.v(TAG, "Parent activity must implement ReportProvider");
             cce.printStackTrace();
         }
     }
@@ -97,7 +102,7 @@ public class PicturesFragment extends Fragment {
                     new DeletePictureTask().execute(picturePath);
                 }
 
-                mPicturesUpdatedListener.updateData(mPicturesAdapter.getItems(), true);
+                ((OnPictureUpdatedListener) getActivity()).updateData(mPicturesAdapter.getItems(), true);
             }
         };
         mAnimateDismissAdapter = new AnimateDismissAdapter(mPicturesAdapter, mDismissCallback);
@@ -146,9 +151,22 @@ public class PicturesFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        setReport(((ReportProvider) getActivity()).getReport());
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-        mPicturesUpdatedListener.updateData(mPicturesAdapter.getItems(), false);
+        ((OnPictureUpdatedListener) getActivity()).updateData(mPicturesAdapter.getItems(), false);
+    }
+
+    public void notifyReportUpdated() {
+        Log.v(TAG, "notifyReportUpdated called");
+        if (isResumed()) {
+            setReport(((ReportProvider) getActivity()).getReport());
+        }
     }
 
     private void deleteSelectedItems() {
@@ -182,10 +200,8 @@ public class PicturesFragment extends Fragment {
         }
     }
 
-    public void setReport(Report report) {
+    private void setReport(Report report) {
         mPicturesAdapter.updatePictures(report.pictures);
-        Log.v(TAG, "setReport : " + report.pictures.size() + " items in the new report, " + mPicturesAdapter.getCount()
-                + " in the adapter, " + mGridView.getCount() + " in the gridview");
     }
 
     public interface OnPictureUpdatedListener {

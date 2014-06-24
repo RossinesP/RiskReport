@@ -32,7 +32,7 @@ import java.util.Date;
 /**
  * Created by pierrerossines on 09/06/2014.
  */
-public class ReportActivity extends FragmentActivity implements DescriptionFragment.OnUpdateReportListener, PicturesFragment.OnPictureUpdatedListener {
+public class ReportActivity extends FragmentActivity implements DescriptionFragment.OnUpdateReportListener, PicturesFragment.OnPictureUpdatedListener, ReportProvider {
     public final static String EXTRA_REPORTID = "reportid";
 
     private final static String EXTRA_LASTPICTURE = "lastPicture";
@@ -44,10 +44,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     private Uri mPictureToAdd;
 
     private final File mReportFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "RiskReport");
-
+    private final static int DESCRIPTION_FRAGMENT_POS = 0;
+    private final static int PICTURES_FRAGMENT_POS = 1;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
-
 
     private class LoadReportTask extends AsyncTask<Long, Void, Report> {
         @Override
@@ -58,6 +58,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
         @Override
         protected Report doInBackground(Long... params) {
+            Log.v(TAG, "Loading report with id " + params[0]);
             ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
             Report result = dbHandler.getReport(params[0]);
             dbHandler.closeDatabase();
@@ -67,13 +68,12 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPostExecute(Report report) {
             super.onPostExecute(report);
-            setReport(report);
             Log.i(TAG, "Loaded report with id " + report.sqlId);
+            setReport(report);
         }
-    };
+    }
 
     private class UpdateReportTask extends AsyncTask<Report, Void, Long> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -83,6 +83,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected Long doInBackground(final Report... params) {
             Report report = params[0];
+            Log.v(TAG, "Saving report with id " + report.sqlId + " and name " + report.riskName);
             ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
             long result = dbHandler.addOrUpdateReport(report);
             dbHandler.closeDatabase();
@@ -113,6 +114,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
         @Override
         protected Boolean doInBackground(Report... params) {
+            Log.v(TAG , "Deleting report with id " + params[0].sqlId + " and name " + params[0].riskName);
             ReportDbHandler handler = ReportDbHandler.getInstance(ReportActivity.this);
             boolean result = handler.deleteReport(params[0].sqlId);
             handler.closeDatabase();
@@ -122,19 +124,20 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPostExecute(Boolean deleted) {
             super.onPostExecute(deleted);
-            setReport(new Report());
+            Log.v(TAG , "Report deleted");
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(TAG, "onCreate called");
+        mReport = new Report();
         setContentView(R.layout.activity_report);
 
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        mReport = new Report();
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
@@ -181,6 +184,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
     private void loadReport(Bundle savedInstanceState) {
         Log.v(TAG, "loadReport called");
+
         if (savedInstanceState != null) {
             Log.v(TAG, "Save instance state present !");
             String lastPicture = savedInstanceState.getString(EXTRA_LASTPICTURE);
@@ -189,11 +193,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
                 mLastAskedPicture = Uri.parse(lastPicture);
             }
 
-            long sqliteId = savedInstanceState.getLong(EXTRA_REPORTID, -1);
-            if (sqliteId != -1) {
-                Log.v(TAG, "SqlId present : " + sqliteId);
-                new LoadReportTask().execute(sqliteId);
-                return;
+            Report savedReport = Report.getReport(savedInstanceState);
+            if (!savedReport.isEmpty()) {
+                Log.v(TAG, "Loading report from the saved instance state, id = " + savedReport.sqlId);
+                setReport(savedReport);
             }
         }
 
@@ -209,16 +212,13 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         if (mReport.isEmpty()) {
+            Log.v(TAG, "Deleting the empty report");
             new DeleteReportTask().execute(mReport);
         } else {
+            Log.v(TAG, "Saving the report");
             new UpdateReportTask().execute(mReport);
         }
     }
@@ -244,9 +244,8 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.v(TAG, "onSaveInstanceState()");
-        if (mReport.sqlId != -1) {
-            outState.putLong(EXTRA_REPORTID, mReport.sqlId);
-        }
+        mReport.writeReport(outState);
+
         if (mLastAskedPicture != null) {
             outState.putString(EXTRA_LASTPICTURE, mLastAskedPicture.toString());
         }
@@ -282,7 +281,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             if (mReport != null && mLastAskedPicture != null) {
                 Log.v(TAG, "Adding a last Asked picture in onActivityResult");
-                if (mReport.sqlId != -1) {
+                if (mReport != null) {
                     mReport.pictures.add(mLastAskedPicture.toString());
                     new UpdateReportTask().execute(mReport);
                 } else {
@@ -294,19 +293,27 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     }
 
     private void setReport(final Report report) {
-        Log.v(TAG, "setReport called with id " + report.sqlId);
+        Log.v(TAG, "setReport called with id " + report.sqlId + ", report title is " + report.riskName);
         mReport = report;
         getActionBar().setTitle(mReport.riskName);
-        ((DescriptionFragment) mPagerAdapter.getItem(0)).setReport(mReport);
-        ((PicturesFragment) mPagerAdapter.getItem(1)).setReport(mReport);
 
         if (mPictureToAdd != null) {
+            Log.v(TAG, "Added a picture !");
             mReport.pictures.add(mPictureToAdd.toString());
             mPictureToAdd = null;
 
             new UpdateReportTask().execute(mReport);
         }
+
+        ((DescriptionFragment) mPagerAdapter.getItem(DESCRIPTION_FRAGMENT_POS)).notifyReportUpdated();
+        ((PicturesFragment) mPagerAdapter.getItem(PICTURES_FRAGMENT_POS)).notifyReportUpdated();
     }
+
+    @Override
+    public Report getReport() {
+        return mReport;
+    }
+
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -360,12 +367,12 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0:
+                case DESCRIPTION_FRAGMENT_POS:
                     if (mDescriptionFragment == null) {
                         mDescriptionFragment = new DescriptionFragment();
                     }
                     return mDescriptionFragment;
-                case 1:
+                case PICTURES_FRAGMENT_POS:
                     if (mPicturesFragment == null) {
                         mPicturesFragment = new PicturesFragment();
                     }
@@ -382,9 +389,9 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0:
+                case DESCRIPTION_FRAGMENT_POS:
                     return getString(R.string.label_description);
-                case 1:
+                case PICTURES_FRAGMENT_POS:
                     return getString(R.string.label_pictures);
                 default:
                     return "";
@@ -429,4 +436,5 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
             }
         }
     }
+
 }

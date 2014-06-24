@@ -23,7 +23,7 @@ import com.ergo404.reportaproblem.Report;
  * Created by pierrerossines on 09/06/2014.
  */
 public class DescriptionFragment extends Fragment implements View.OnFocusChangeListener {
-    private final static String TAG = DescriptionFragment.class.getName();
+    private final static String TAG = DescriptionFragment.class.getSimpleName();
     private LinearLayout mDescriptionLayout;
     private LinearLayout mTargetsLayout;
     private LinearLayout mRisksLayout;
@@ -55,15 +55,18 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
     private ImageView mExpandRisks;
     private ImageView mExpandFix;
 
-    private OnUpdateReportListener mListener;
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnUpdateReportListener) activity;
+            OnUpdateReportListener listener = (OnUpdateReportListener) activity;
         } catch (ClassCastException exception) {
             Log.v(TAG, "The parent activity must implement OnUpdateReportListener");
+        }
+        try {
+            ReportProvider provider = (ReportProvider) activity;
+        } catch (ClassCastException exception) {
+            Log.v(TAG, "The parent activity must implement ReportProvider");
         }
     }
 
@@ -155,17 +158,27 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
     @Override
     public void onResume() {
         super.onResume();
+        Log.v(TAG, "onResume()");
+        setReport(((ReportProvider) getActivity()).getReport());
         expandDescription();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.v(TAG, "onPause()");
         updateData();
     }
 
+    public void notifyReportUpdated() {
+        Log.v(TAG, "notifyReportUpdated called");
+        if (isResumed()) {
+            setReport(((ReportProvider) getActivity()).getReport());
+        }
+    }
+
     public void updateData() {
-        mListener.updateData(mProblemName.getText().toString(),
+        ((OnUpdateReportListener) getActivity()).updateData(mProblemName.getText().toString(),
                 mProblemDescription.getText().toString(),
                 mWorkUnit.getText().toString(),
                 mWorkPlace.getText().toString(),

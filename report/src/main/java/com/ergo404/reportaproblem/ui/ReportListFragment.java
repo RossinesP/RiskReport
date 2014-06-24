@@ -1,9 +1,13 @@
 package com.ergo404.reportaproblem.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
@@ -37,6 +41,15 @@ import java.util.ArrayList;
 public class ReportListFragment extends ListFragment {
 
     private final static String TAG = ReportListFragment.class.getSimpleName();
+
+    private LocalBroadcastManager mBroadcastMgr;
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            new UpdateListTask().execute();
+        }
+    };
+
     private class UpdateListTask extends AsyncTask<Void, Void, ArrayList<Report>> {
 
         @Override
@@ -96,8 +109,7 @@ public class ReportListFragment extends ListFragment {
         emptyText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent reportI = new Intent(getActivity(), ReportActivity.class);
-                startActivity(reportI);
+            ((ReportCreator) getActivity()).createReport();
             }
         });
 
@@ -106,6 +118,8 @@ public class ReportListFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mBroadcastMgr = LocalBroadcastManager.getInstance(getActivity());
+
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -225,13 +239,14 @@ public class ReportListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-
         new UpdateListTask().execute();
+        mBroadcastMgr.registerReceiver(mReceiver, new IntentFilter(ReportDbHandler.INTENT_DB_CHANGED));
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mBroadcastMgr.unregisterReceiver(mReceiver);
     }
 
     @Override
