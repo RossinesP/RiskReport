@@ -1,8 +1,10 @@
 package com.ergo404.reportaproblem.ui;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +13,9 @@ import android.view.MenuItem;
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
+
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by pierrerossines on 07/06/2014.
@@ -62,6 +67,4 @@ public class ReportListActivity extends FragmentActivity implements ReportCreato
             startActivity(reportI);
         }
     }
-
-
 }

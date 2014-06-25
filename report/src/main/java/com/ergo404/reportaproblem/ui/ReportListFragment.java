@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
@@ -33,7 +35,9 @@ import com.ergo404.reportaproblem.ui.adapters.ReportListAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by pierrerossines on 07/06/2014.
@@ -170,6 +174,10 @@ public class ReportListFragment extends ListFragment {
                         deleteSelectedItems();
                         mode.finish();
                         return true;
+                    case R.id.action_send:
+                        sendSelectedItems();
+                        mode.finish();
+                        return true;
                     default:
                         return false;
                 }
@@ -218,6 +226,18 @@ public class ReportListFragment extends ListFragment {
         });
     }
 
+    private void sendSelectedItems() {
+        SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+        ArrayList<Report> selectedItems = new ArrayList<Report>();
+        for (int i = 0; i < mAdapter.getCount(); i++) {
+            if (checkedItems.get(i, false)) {
+                selectedItems.add((Report) mAdapter.getItem(i));
+            }
+        }
+
+        new GenerateAndSendReport().execute(selectedItems);
+    }
+
     private void deleteSelectedItems() {
         SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
         ArrayList<Integer> deleteList = new ArrayList<Integer>();
@@ -253,6 +273,28 @@ public class ReportListFragment extends ListFragment {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(ContextMenu.NONE, ContextMenu.NONE, ContextMenu.NONE, R.string.delete_report);
+    }
+
+    private class GenerateAndSendReport extends AsyncTask<ArrayList<Report>, Void, Void> {
+        private final File mReportFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "RiskReport");
+
+        private File createFolder() {
+            boolean result = (mReportFolder.mkdirs() || mReportFolder.isDirectory());
+            return result ? mReportFolder : null;
+        }
+
+        @Override
+        protected Void doInBackground(ArrayList<Report>... reports) {
+            createFolder();
+            ArrayList<String> files = new ArrayList<String>();
+            for (Report report : reports[0]) {
+                String filePath = report.writePDFReport(mReportFolder.getAbsolutePath());
+                files.add(filePath);
+            }
+
+            Report.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
+            return null;
+        }
     }
 
 }

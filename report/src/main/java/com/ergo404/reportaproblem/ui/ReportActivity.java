@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
@@ -48,85 +49,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     private final static int PICTURES_FRAGMENT_POS = 1;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
-
-    private class LoadReportTask extends AsyncTask<Long, Void, Report> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i(TAG, "Loading the report from the DB");
-        }
-
-        @Override
-        protected Report doInBackground(Long... params) {
-            Log.v(TAG, "Loading report with id " + params[0]);
-            ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
-            Report result = dbHandler.getReport(params[0]);
-            dbHandler.closeDatabase();
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Report report) {
-            super.onPostExecute(report);
-            Log.i(TAG, "Loaded report with id " + report.sqlId);
-            setReport(report);
-        }
-    }
-
-    private class UpdateReportTask extends AsyncTask<Report, Void, Long> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i(TAG , "Saving the report to the DB");
-        }
-
-        @Override
-        protected Long doInBackground(final Report... params) {
-            Report report = params[0];
-            Log.v(TAG, "Saving report with id " + report.sqlId + " and name " + report.riskName);
-            ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
-            long result = dbHandler.addOrUpdateReport(report);
-            dbHandler.closeDatabase();
-
-            if (report.sqlId != -1) {
-                return report.sqlId;
-            } else {
-                return result;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Long sqlId) {
-            super.onPostExecute(sqlId);
-            Log.v(TAG, "Report saved, id = " + sqlId);
-            mReport.sqlId = sqlId;
-            setReport(mReport);
-        }
-    }
-
-    private class DeleteReportTask extends AsyncTask<Report, Void, Boolean> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i(TAG , "Deleting the report from the DB");
-        }
-
-        @Override
-        protected Boolean doInBackground(Report... params) {
-            Log.v(TAG , "Deleting report with id " + params[0].sqlId + " and name " + params[0].riskName);
-            ReportDbHandler handler = ReportDbHandler.getInstance(ReportActivity.this);
-            boolean result = handler.deleteReport(params[0].sqlId);
-            handler.closeDatabase();
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean deleted) {
-            super.onPostExecute(deleted);
-            Log.v(TAG , "Report deleted");
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +157,9 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         switch (item.getItemId()) {
             case R.id.action_addpicture:
                 dispatchTakePictureIntent();
+                return true;
+            case R.id.action_sendreport:
+                new GenerateAndSendReport().execute(mReport);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -398,6 +323,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
             }
         }
     }
+
     private class ZoomOutPageTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.85f;
         private static final float MIN_ALPHA = 0.5f;
@@ -437,4 +363,95 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         }
     }
 
+    private class GenerateAndSendReport extends AsyncTask<Report, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Report... reports) {
+            createFolder();
+            Report report = reports[0];
+            String filePath = report.writePDFReport(mReportFolder.getAbsolutePath());
+
+            Report.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
+            return null;
+        }
+    }
+
+    private class LoadReportTask extends AsyncTask<Long, Void, Report> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.i(TAG, "Loading the report from the DB");
+        }
+
+        @Override
+        protected Report doInBackground(Long... params) {
+            Log.v(TAG, "Loading report with id " + params[0]);
+            ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
+            Report result = dbHandler.getReport(params[0]);
+            dbHandler.closeDatabase();
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Report report) {
+            super.onPostExecute(report);
+            Log.i(TAG, "Loaded report with id " + report.sqlId);
+            setReport(report);
+        }
+    }
+
+    private class UpdateReportTask extends AsyncTask<Report, Void, Long> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.i(TAG , "Saving the report to the DB");
+        }
+
+        @Override
+        protected Long doInBackground(final Report... params) {
+            Report report = params[0];
+            Log.v(TAG, "Saving report with id " + report.sqlId + " and name " + report.riskName);
+            ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
+            long result = dbHandler.addOrUpdateReport(report);
+            dbHandler.closeDatabase();
+
+            if (report.sqlId != -1) {
+                return report.sqlId;
+            } else {
+                return result;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Long sqlId) {
+            super.onPostExecute(sqlId);
+            Log.v(TAG, "Report saved, id = " + sqlId);
+            mReport.sqlId = sqlId;
+            setReport(mReport);
+        }
+    }
+
+    private class DeleteReportTask extends AsyncTask<Report, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.i(TAG , "Deleting the report from the DB");
+        }
+
+        @Override
+        protected Boolean doInBackground(Report... params) {
+            Log.v(TAG , "Deleting report with id " + params[0].sqlId + " and name " + params[0].riskName);
+            ReportDbHandler handler = ReportDbHandler.getInstance(ReportActivity.this);
+            boolean result = handler.deleteReport(params[0].sqlId);
+            handler.closeDatabase();
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean deleted) {
+            super.onPostExecute(deleted);
+            Log.v(TAG , "Report deleted");
+        }
+    }
 }
