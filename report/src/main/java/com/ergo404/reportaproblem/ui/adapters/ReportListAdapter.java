@@ -1,31 +1,56 @@
 package com.ergo404.reportaproblem.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by pierrerossines on 08/06/2014.
  */
 public class ReportListAdapter extends BaseAdapter {
+    private final static String TAG = ReportListAdapter.class.getSimpleName();
     private ArrayList<Report> mReportsList;
     private Context mContext;
     private java.text.DateFormat mDateFormatter;
+    private ImageLoader mImageLoader;
+    private HashMap<String, Bitmap> mBitmapCache;
 
     public ReportListAdapter(Context context) {
         mContext = context;
         mReportsList = new ArrayList<Report>();
         mDateFormatter = DateFormat.getDateFormat(mContext);
+
+        mImageLoader = ImageLoader.getInstance();
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.ARGB_4444)
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                .defaultDisplayImageOptions(defaultOptions)
+                .build();
+        mImageLoader.init(config);
+
+        mBitmapCache = new HashMap<String, Bitmap>();
     }
 
     public void updateReportsList(ArrayList<Report> newReportsList) {
@@ -35,6 +60,10 @@ public class ReportListAdapter extends BaseAdapter {
     }
 
     public void remove(int position) {
+        Report report = mReportsList.get(position);
+        if (report.pictures.size() > 0) {
+            mBitmapCache.remove(report.pictures.get(0));
+        }
         mReportsList.remove(position);
         notifyDataSetChanged();
     }
@@ -63,6 +92,7 @@ public class ReportListAdapter extends BaseAdapter {
             viewHolder.riskName = (TextView) convertView.findViewById(R.id.risk_name);
             viewHolder.workPlace = (TextView) convertView.findViewById(R.id.work_place);
             viewHolder.riskDate = (TextView) convertView.findViewById(R.id.report_date);
+            viewHolder.riskPicture = (ImageView) convertView.findViewById(R.id.report_picture);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -74,6 +104,40 @@ public class ReportListAdapter extends BaseAdapter {
 
         String date = mDateFormatter.format(new Date(report.date));
         viewHolder.riskDate.setText(date);
+
+        Log.v(TAG, "Report name : " + report.riskName + ", pictures : " +report.pictures.size());
+        if (report.pictures.size() > 0) {
+            final String path = report.pictures.get(0);
+            Bitmap bitmap = mBitmapCache.get(path);
+            if (bitmap != null) {
+                viewHolder.riskPicture.setImageBitmap(bitmap);
+            } else {
+                mImageLoader.displayImage(path, viewHolder.riskPicture, new ImageLoadingListener() {
+                    @Override
+                    public void onLoadingStarted(String s, View view) {
+
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String s, View view, FailReason failReason) {
+
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                        mBitmapCache.put(path, bitmap);
+                    }
+
+                    @Override
+                    public void onLoadingCancelled(String s, View view) {
+
+                    }
+                });
+            }
+        } else {
+            viewHolder.riskPicture.setImageBitmap(null);
+        }
+
         return convertView;
     }
 
@@ -81,5 +145,6 @@ public class ReportListAdapter extends BaseAdapter {
         public TextView riskName;
         public TextView workPlace;
         public TextView riskDate;
+        public ImageView riskPicture;
     }
 }

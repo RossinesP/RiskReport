@@ -14,8 +14,9 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.ReportActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
         </activity>
+
         <activity android:name=".ui.ReportListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

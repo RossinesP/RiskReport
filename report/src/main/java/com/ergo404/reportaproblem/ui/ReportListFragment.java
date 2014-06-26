@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,7 +36,6 @@ import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by pierrerossines on 07/06/2014.
@@ -54,46 +52,13 @@ public class ReportListFragment extends ListFragment {
         }
     };
 
-    private class UpdateListTask extends AsyncTask<Void, Void, ArrayList<Report>> {
-
-        @Override
-        protected ArrayList<Report> doInBackground(Void... params) {
-            ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());
-            ArrayList<Report> reportList = handler.getReports();
-            return reportList;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Report> list) {
-            super.onPostExecute(list);
-            mAdapter.updateReportsList(list);
-        }
-    }
-
-    private class DeleteReportTask extends AsyncTask<ArrayList<Long>, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(ArrayList<Long>... params) {
-            ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());
-            boolean result = handler.deleteReports(params[0]);
-            handler.closeDatabase();
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean deleted) {
-            super.onPostExecute(deleted);
-            if (deleted) {
-                Toast.makeText(getActivity(), getString(R.string.toast_report_deleted), Toast.LENGTH_SHORT).show();
-            }
-
-            new UpdateListTask().execute();
-        }
-    }
-
     private ReportListAdapter mAdapter;
     private AnimateDismissAdapter mDismissAdapter;
 
+    /*
+    private GridView mGridView;
+    private ViewGroup mEmptyLayout;
+    */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reportlist, container, false);
@@ -103,6 +68,23 @@ public class ReportListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        /*
+        mGridView = (GridView) view.findViewById(R.id.gridview);
+        mGridView.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View parent, View child) {
+                updateGridView();
+            }
+
+            @Override
+            public void onChildViewRemoved(View parent, View child) {
+                updateGridView();
+            }
+        });
+        mEmptyLayout = (ViewGroup) view.findViewById(R.id.empty);
+        */
+
         TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
         String emptyTextS = getString(R.string.reportlist_empty);
         int imgPos = emptyTextS.indexOf("image");
@@ -118,6 +100,17 @@ public class ReportListFragment extends ListFragment {
         });
 
     }
+
+    /*
+    private void updateGridView() {
+        if (mGridView.getCount() > 0) {
+            mEmptyLayout.setVisibility(View.GONE);
+            mGridView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyLayout.setVisibility(View.VISIBLE);
+            mGridView.setVisibility(View.GONE);
+        }
+    }*/
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -148,7 +141,7 @@ public class ReportListFragment extends ListFragment {
             }
         });
         mDismissAdapter.setAbsListView(getListView());
-        setListAdapter(mDismissAdapter);
+        getListView().setAdapter(mDismissAdapter);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setSelector(android.R.color.darker_gray);
@@ -253,7 +246,7 @@ public class ReportListFragment extends ListFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        setListAdapter(null);
+        getListView().setAdapter(null);
     }
 
     @Override
@@ -294,6 +287,44 @@ public class ReportListFragment extends ListFragment {
 
             Report.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
             return null;
+        }
+    }
+
+    private class UpdateListTask extends AsyncTask<Void, Void, ArrayList<Report>> {
+
+        @Override
+        protected ArrayList<Report> doInBackground(Void... params) {
+            ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());
+            ArrayList<Report> reportList = handler.getReports();
+            return reportList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Report> list) {
+            super.onPostExecute(list);
+            mAdapter.updateReportsList(list);
+            //updateGridView();
+        }
+    }
+
+    private class DeleteReportTask extends AsyncTask<ArrayList<Long>, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(ArrayList<Long>... params) {
+            ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());
+            boolean result = handler.deleteReports(params[0]);
+            handler.closeDatabase();
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean deleted) {
+            super.onPostExecute(deleted);
+            if (deleted) {
+                Toast.makeText(getActivity(), getString(R.string.toast_report_deleted), Toast.LENGTH_SHORT).show();
+            }
+
+            new UpdateListTask().execute();
         }
     }
 
