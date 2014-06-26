@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
@@ -209,6 +208,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
                 if (mReport != null) {
                     mReport.pictures.add(mLastAskedPicture.toString());
                     new UpdateReportTask().execute(mReport);
+                    mPager.setCurrentItem(PICTURES_FRAGMENT_POS, true);
                 } else {
                     mPictureToAdd = mLastAskedPicture;
                 }
@@ -226,7 +226,8 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
             Log.v(TAG, "Added a picture !");
             mReport.pictures.add(mPictureToAdd.toString());
             mPictureToAdd = null;
-
+            mPager.setCurrentItem(PICTURES_FRAGMENT_POS, true);
+            
             new UpdateReportTask().execute(mReport);
         }
 
