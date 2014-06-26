@@ -36,29 +36,6 @@ public class PicturesFragment extends Fragment {
     private PictureListAdapter mPicturesAdapter;
     private AnimateDismissAdapter mAnimateDismissAdapter;
 
-    private class DeletePictureTask extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String path = params[0];
-            Log.i(TAG, "Deleting picture " + Uri.parse(path).getPath());
-            File pictureF = new File(Uri.parse(path).getPath());
-            boolean result = pictureF.delete();
-            if (!result) {
-                Log.e(TAG, "Could not delete picture " + Uri.parse(path).getPath());
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean deleted) {
-            super.onPostExecute(deleted);
-            if (deleted) {
-                Toast.makeText(getActivity(), getString(R.string.toast_image_deleted), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_pictures, container, false);
@@ -114,6 +91,11 @@ public class PicturesFragment extends Fragment {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 updateCABTitle(mode);
+                if (checked) {
+                    mPicturesAdapter.select(position);
+                } else {
+                    mPicturesAdapter.unselect(position);
+                }
             }
 
             @Override
@@ -202,6 +184,29 @@ public class PicturesFragment extends Fragment {
 
     private void setReport(Report report) {
         mPicturesAdapter.updatePictures(report.pictures);
+    }
+
+    private class DeletePictureTask extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String path = params[0];
+            Log.i(TAG, "Deleting picture " + Uri.parse(path).getPath());
+            File pictureF = new File(Uri.parse(path).getPath());
+            boolean result = pictureF.delete();
+            if (!result) {
+                Log.e(TAG, "Could not delete picture " + Uri.parse(path).getPath());
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean deleted) {
+            super.onPostExecute(deleted);
+            if (deleted) {
+                Toast.makeText(getActivity(), getString(R.string.toast_image_deleted), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public interface OnPictureUpdatedListener {

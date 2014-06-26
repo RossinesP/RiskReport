@@ -1,11 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/gridview_vertical_item_padding"
     android:paddingBottom="@dimen/gridview_vertical_item_padding"
     android:paddingLeft="@dimen/gridview_horizontal_item_padding"
-    android:paddingRight="@dimen/gridview_horizontal_item_padding">
+    android:paddingRight="@dimen/gridview_horizontal_item_padding"
+    android:background="@drawable/item_background">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

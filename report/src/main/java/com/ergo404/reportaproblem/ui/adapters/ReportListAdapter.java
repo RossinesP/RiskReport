@@ -34,6 +34,7 @@ public class ReportListAdapter extends BaseAdapter {
     private java.text.DateFormat mDateFormatter;
     private ImageLoader mImageLoader;
     private HashMap<String, Bitmap> mBitmapCache;
+    private ArrayList<Integer> mSelected;
 
     public ReportListAdapter(Context context) {
         mContext = context;
@@ -55,11 +56,13 @@ public class ReportListAdapter extends BaseAdapter {
         mImageLoader.init(config);
 
         mBitmapCache = new HashMap<String, Bitmap>();
+        mSelected = new ArrayList<Integer>();
     }
 
     public void updateReportsList(ArrayList<Report> newReportsList) {
         mReportsList.clear();
         mReportsList.addAll(newReportsList);
+        mSelected.clear();
         notifyDataSetChanged();
     }
 
@@ -69,6 +72,16 @@ public class ReportListAdapter extends BaseAdapter {
             mBitmapCache.remove(report.pictures.get(0));
         }
         mReportsList.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void select(int position) {
+        mSelected.add(position);
+        notifyDataSetChanged();
+    }
+
+    public void unselect(int position) {
+        mSelected.remove((Integer) position);
         notifyDataSetChanged();
     }
 
@@ -97,6 +110,7 @@ public class ReportListAdapter extends BaseAdapter {
             viewHolder.workPlace = (TextView) convertView.findViewById(R.id.work_place);
             viewHolder.riskDate = (TextView) convertView.findViewById(R.id.report_date);
             viewHolder.riskPicture = (ImageView) convertView.findViewById(R.id.report_picture);
+            viewHolder.root = (ViewGroup) convertView.findViewById(R.id.item_root);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -145,6 +159,11 @@ public class ReportListAdapter extends BaseAdapter {
             viewHolder.riskPicture.setVisibility(View.GONE);
         }
 
+        viewHolder.root.setBackgroundColor(mSelected.contains(position) ?
+                mContext.getResources().getColor(android.R.color.darker_gray) :
+                mContext.getResources().getColor(android.R.color.transparent));
+
+
         return convertView;
     }
 
@@ -153,5 +172,6 @@ public class ReportListAdapter extends BaseAdapter {
         public TextView workPlace;
         public TextView riskDate;
         public ImageView riskPicture;
+        public ViewGroup root;
     }
 }

@@ -29,6 +29,8 @@ public class PictureListAdapter extends BaseAdapter {
     private ImageLoader mImageLoader;
     private HashMap<String, Bitmap> mBitmapCache;
 
+    private ArrayList<Integer> mSelected;
+
     public PictureListAdapter(Context context) {
         mContext = context;
         mPictures = new ArrayList<String>();
@@ -44,11 +46,13 @@ public class PictureListAdapter extends BaseAdapter {
         mImageLoader.init(config);
 
         mBitmapCache = new HashMap<String, Bitmap>();
+        mSelected = new ArrayList<Integer>();
     }
 
     public void updatePictures(ArrayList<String> newPictures) {
         mPictures.clear();
         mPictures.addAll(newPictures);
+        mSelected.clear();
         notifyDataSetChanged();
     }
 
@@ -57,6 +61,18 @@ public class PictureListAdapter extends BaseAdapter {
         mPictures.remove(position);
         notifyDataSetChanged();
     }
+
+
+    public void select(int position) {
+        mSelected.add(position);
+        notifyDataSetChanged();
+    }
+
+    public void unselect(int position) {
+        mSelected.remove((Integer) position);
+        notifyDataSetChanged();
+    }
+
     public ArrayList<String> getItems() {
         return mPictures;
     }
@@ -78,21 +94,22 @@ public class PictureListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder viewHolder;
         if (convertView == null || convertView.getLayoutParams().height == 0) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.picture_item, parent, false);
-            holder = new ViewHolder();
-            holder.imageView = (ImageView) convertView.findViewById(R.id.picture);
-            convertView.setTag(holder);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_picture, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.picture);
+            viewHolder.root = (ViewGroup) convertView.findViewById(R.id.item_root);
+            convertView.setTag(viewHolder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
         final String path = mPictures.get(position);
         Bitmap bitmap = mBitmapCache.get(path);
         if (bitmap != null) {
-            holder.imageView.setImageBitmap(bitmap);
+            viewHolder.imageView.setImageBitmap(bitmap);
         } else {
-            mImageLoader.displayImage(mPictures.get(position), holder.imageView, new ImageLoadingListener() {
+            mImageLoader.displayImage(mPictures.get(position), viewHolder.imageView, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted(String s, View view) {
 
@@ -114,10 +131,16 @@ public class PictureListAdapter extends BaseAdapter {
                 }
             });
         }
+
+        viewHolder.root.setBackgroundColor(mSelected.contains(position) ?
+                mContext.getResources().getColor(android.R.color.darker_gray) :
+                mContext.getResources().getColor(android.R.color.transparent));
+
         return convertView;
     }
 
     private class ViewHolder {
         private ImageView imageView;
+        private ViewGroup root;
     }
 }

@@ -12,6 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.ContextMenu;
@@ -144,7 +145,6 @@ public class ReportListFragment extends ListFragment {
         getListView().setAdapter(mDismissAdapter);
 
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().setSelector(android.R.color.darker_gray);
         getListView().setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
 
             @Override
@@ -153,6 +153,12 @@ public class ReportListFragment extends ListFragment {
                 // Here you can do something when items are selected/de-selected,
                 // such as update the title in the CAB
                 updateCABTitle(mode);
+
+                if (checked) {
+                    mAdapter.select(position);
+                } else {
+                    mAdapter.unselect(position);
+                }
             }
 
             @Override
@@ -302,6 +308,12 @@ public class ReportListFragment extends ListFragment {
         @Override
         protected void onPostExecute(ArrayList<Report> list) {
             super.onPostExecute(list);
+            ArrayList<Boolean> selected = new ArrayList<Boolean>();
+            SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+            for (int i = 0; i < mAdapter.getCount(); i++) {
+                selected.add(checkedItems.get(i, false));
+            }
+            Log.v(TAG, "UpdateListTask : selected size if " + selected.size() + " list size is " + list.size());
             mAdapter.updateReportsList(list);
             //updateGridView();
         }
