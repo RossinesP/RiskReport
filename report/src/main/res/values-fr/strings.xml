@@ -42,4 +42,5 @@
     <string name="toast_image_deleted">Photo(s) supprimée</string>
 
     <string name="send_report">Envoyer</string>
+    <string name="no_title">Pas de titre</string>
 </resources>

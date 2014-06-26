@@ -49,7 +49,8 @@
             android:layout_below="@id/work_place"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
+            android:maxHeight="150dp"
             android:adjustViewBounds="true"
             android:focusable="false"/>
     </RelativeLayout>

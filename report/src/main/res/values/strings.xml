@@ -42,5 +42,6 @@
     <string name="toast_image_deleted">Picture(s) deleted</string>
 
     <string name="send_report">Send</string>
+    <string name="no_title">No title</string>
 
 </resources>

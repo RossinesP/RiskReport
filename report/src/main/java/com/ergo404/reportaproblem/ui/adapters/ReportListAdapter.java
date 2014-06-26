@@ -2,6 +2,7 @@ package com.ergo404.reportaproblem.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,9 +41,12 @@ public class ReportListAdapter extends BaseAdapter {
         mDateFormatter = DateFormat.getDateFormat(mContext);
 
         mImageLoader = ImageLoader.getInstance();
+        BitmapFactory.Options decodingOptions = new BitmapFactory.Options();
+        decodingOptions.inSampleSize = 6;
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
+                .decodingOptions(decodingOptions)
                 .bitmapConfig(Bitmap.Config.ARGB_4444)
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
@@ -99,7 +103,8 @@ public class ReportListAdapter extends BaseAdapter {
         }
 
         Report report = (Report) getItem(position);
-        viewHolder.riskName.setText(report.riskName);
+
+        viewHolder.riskName.setText(report.riskName.isEmpty() ? mContext.getString(R.string.no_title) : report.riskName);
         viewHolder.workPlace.setText(report.workPlace);
 
         String date = mDateFormatter.format(new Date(report.date));
@@ -107,6 +112,7 @@ public class ReportListAdapter extends BaseAdapter {
 
         Log.v(TAG, "Report name : " + report.riskName + ", pictures : " +report.pictures.size());
         if (report.pictures.size() > 0) {
+            viewHolder.riskPicture.setVisibility(View.VISIBLE);
             final String path = report.pictures.get(0);
             Bitmap bitmap = mBitmapCache.get(path);
             if (bitmap != null) {
@@ -136,6 +142,7 @@ public class ReportListAdapter extends BaseAdapter {
             }
         } else {
             viewHolder.riskPicture.setImageBitmap(null);
+            viewHolder.riskPicture.setVisibility(View.GONE);
         }
 
         return convertView;
