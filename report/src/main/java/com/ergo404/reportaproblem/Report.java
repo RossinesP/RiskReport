@@ -136,18 +136,122 @@ public class Report {
         return report;
     }
 
-    private String generatePDF() {
+    private static String getPercentage(Context context, int textRes, int value) {
+        return context.getString(textRes).replace("%num", (value == 0)
+                ? context.getString(R.string.undefined) : (value - 1)*25 + "%");
+    }
+
+    private static String getRatio(Context context, int textRes, int value) {
+        return context.getString(textRes).replace("%num", (value == 0)
+                ? context.getString(R.string.undefined) : (value - 1) + "/4");
+    }
+
+    public static String getTitleString(Context context, String title) {
+        if (title.isEmpty()) {
+            return context.getString(R.string.no_title);
+        } else {
+            return context.getString(R.string.display_risk_name).replace("%value", title);
+        }
+    }
+
+    public static String getDescriptionString(Context context, String description) {
+        return context.getString(R.string.display_risk_description).replace("%value",
+                description.isEmpty()
+                ? context.getString(R.string.undefined) : description);
+    }
+
+    public static String getWorkUnitString(Context context, String workUnit) {
+        return context.getString(R.string.display_work_unit).replace("%value",
+                workUnit.isEmpty()
+                        ? context.getString(R.string.undefined) : workUnit);
+    }
+
+    public static String getWorkPlaceString(Context context, String workPlace) {
+        return context.getString(R.string.display_work_place).replace("%value",
+                workPlace.isEmpty()
+                        ? context.getString(R.string.undefined) : workPlace);
+    }
+
+    public static String getEmployeesString(Context context, int riskEmployees) {
+        return getRatio(context, R.string.number_employees, riskEmployees);
+    }
+
+    public static String getThirdString(Context context, int riskThirdParty) {
+        return getRatio(context, R.string.number_third, riskThirdParty);
+    }
+
+    public static String getUsersString(Context context, int riskUsers) {
+        return getRatio(context, R.string.number_users, riskUsers);
+    }
+
+    public static String getWoundString(Context context, int woundRisk) {
+        return getRatio(context, R.string.possible_wound, woundRisk);
+    }
+
+    public static String getSicknessString(Context context, int sicknessRisk) {
+        return getRatio(context, R.string.possible_sickness, sicknessRisk);
+    }
+
+    public static String getPhysicalHardnessString(Context context, int physicalHardness) {
+        return getRatio(context, R.string.physical_hardness, physicalHardness);
+    }
+
+    public static String getMentalHardnessString(Context context, int mentalHardness) {
+        return getRatio(context, R.string.mental_hardness, mentalHardness);
+    }
+
+    public static String getProbabilityString(Context context, int probability) {
+        return getRatio(context, R.string.risk_probability, probability);
+    }
+
+    public static String getFixCostString(Context context, int fixCost) {
+        return getRatio(context, R.string.solution_cost, fixCost);
+    }
+
+    public static String getFixeasinessString(Context context, int fixEasiness) {
+        return getRatio(context, R.string.solution_simplicity, fixEasiness);
+    }
+
+    private String generatePDF(Context context) {
         PDFWriter writer = new PDFWriter(PaperSize.A4_WIDTH, PaperSize.A4_HEIGHT);
 
         final int fontSize = 16;
         final int availableWidth = PaperSize.A4_WIDTH - (2 * PaperSize.A4_MARGIN);
-
+        final int margin = PaperSize.A4_MARGIN;
+        final int pageHeight = PaperSize.A4_HEIGHT;
         writer.setFont(StandardFonts.SUBTYPE, StandardFonts.TIMES_ROMAN);
-        writer.addText(PaperSize.A4_MARGIN, PaperSize.A4_HEIGHT - (PaperSize.A4_MARGIN + fontSize), fontSize, riskName);
-        writer.addText(PaperSize.A4_MARGIN, PaperSize.A4_HEIGHT - (PaperSize.A4_MARGIN + 2 * fontSize), fontSize, riskDescription);
-        writer.addText(PaperSize.A4_MARGIN, PaperSize.A4_HEIGHT - (PaperSize.A4_MARGIN + 3 * fontSize), fontSize, workPlace);
-        writer.addText(PaperSize.A4_MARGIN, PaperSize.A4_HEIGHT - (PaperSize.A4_MARGIN + 4 * fontSize), fontSize, workUnit);
-        writer.addText(PaperSize.A4_MARGIN, PaperSize.A4_HEIGHT - (PaperSize.A4_MARGIN + 5 * fontSize), fontSize, new SimpleDateFormat().format(new Date(date)));
+
+        int i = 1;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getTitleString(context, riskName));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getDescriptionString(context, riskDescription));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getWorkPlaceString(context, workPlace));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getWorkUnitString(context, workUnit));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, new SimpleDateFormat().format(new Date(date)));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getEmployeesString(context, riskEmployees));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getUsersString(context, riskUsers));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getThirdString(context, riskThirdParty));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getWoundString(context, woundRisk));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getSicknessString(context, sicknessRisk));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getPhysicalHardnessString(context, physicalHardness));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getMentalHardnessString(context, mentalHardness));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getProbabilityString(context, probability));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getFixCostString(context, fixCost));
+        i++;
+        writer.addText(margin, pageHeight - (margin + i * fontSize), fontSize, getFixeasinessString(context, fixEasiness));
+        i++;
 
         for (String picture : pictures) {
             Log.v(TAG, picture);
@@ -161,7 +265,7 @@ public class Report {
         return writer.asString();
     }
 
-    public String writePDFReport(String folder) {
+    public String writePDFReport(String folder, Context context) {
         String filePath = folder + File.separator
                 + riskName + "-"
                 + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(date)) + ".pdf";
@@ -170,7 +274,8 @@ public class Report {
             newFile.createNewFile();
             try {
                 FileOutputStream pdfFile = new FileOutputStream(newFile);
-                pdfFile.write(generatePDF().getBytes("ISO-8859-1"));
+                //pdfFile.write(generatePDF(context).getBytes("ISO-8859-1"));
+                pdfFile.write(generatePDF(context).getBytes("UTF-8"));
                 pdfFile.close();
             } catch(FileNotFoundException e) {
                 e.printStackTrace();

@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
@@ -22,7 +23,7 @@ import com.ergo404.reportaproblem.Report;
 /**
  * Created by pierrerossines on 09/06/2014.
  */
-public class DescriptionFragment extends Fragment implements View.OnFocusChangeListener {
+public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
     private final static String TAG = DescriptionFragment.class.getSimpleName();
     private LinearLayout mDescriptionLayout;
     private LinearLayout mTargetsLayout;
@@ -39,15 +40,25 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
     private EditText mProblemName;
     private EditText mProblemDescription;
 
+    private TextView mRiskEmployeesTitle;
     private SeekBar mRiskEmployeesBar;
+    private TextView mRiskUsersTitle;
     private SeekBar mRiskUsersBar;
+    private TextView mRiskThirdTitle;
     private SeekBar mRiskThirdBar;
+    private TextView mWoundRiskTitle;
     private SeekBar mWoundRiskBar;
+    private TextView mSicknessTitle;
     private SeekBar mSicknessRiskBar;
+    private TextView mPhysHardTitle;
     private SeekBar mRiskPhysHardnessBar;
+    private TextView mMentHardTitle;
     private SeekBar mRiskMentalHardnessBar;
+    private TextView mProbabilityTitle;
     private SeekBar mProbabilityBar;
+    private TextView mSolutionEasinessTitle;
     private SeekBar mSolutionEasiness;
+    private TextView mSolutionCostTitle;
     private SeekBar mSolutionCost;
 
     private ImageView mExpandDescription;
@@ -120,34 +131,40 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
         });
 
         mProblemName = (EditText) view.findViewById(R.id.risk_name);
-        mProblemName.setOnFocusChangeListener(this);
         mProblemDescription = (EditText) view.findViewById(R.id.problem_description);
-        mProblemDescription.setOnFocusChangeListener(this);
         mWorkPlace = (EditText) view.findViewById(R.id.work_place);
-        mWorkPlace.setOnFocusChangeListener(this);
         mWorkUnit = (EditText) view.findViewById(R.id.work_unit);
-        mWorkUnit.setOnFocusChangeListener(this);
 
+        mRiskEmployeesTitle = (TextView) view.findViewById(R.id.employees_risk);
         mRiskEmployeesBar = (SeekBar) view.findViewById(R.id.employees_risk_bar);
-        mRiskEmployeesBar.setOnFocusChangeListener(this);
+        mRiskEmployeesBar.setOnSeekBarChangeListener(this);
+        mRiskUsersTitle = (TextView) view.findViewById(R.id.users_risk);
         mRiskUsersBar = (SeekBar) view.findViewById(R.id.users_risk_bar);
-        mRiskUsersBar.setOnFocusChangeListener(this);
+        mRiskUsersBar.setOnSeekBarChangeListener(this);
+        mRiskThirdTitle = (TextView) view.findViewById(R.id.third_party_risk);
         mRiskThirdBar = (SeekBar) view.findViewById(R.id.third_party_risk_bar);
-        mRiskThirdBar.setOnFocusChangeListener(this);
+        mRiskThirdBar.setOnSeekBarChangeListener(this);
+        mWoundRiskTitle = (TextView) view.findViewById(R.id.wound_risk);
         mWoundRiskBar = (SeekBar) view.findViewById(R.id.wound_risk_bar);
-        mWoundRiskBar.setOnFocusChangeListener(this);
+        mWoundRiskBar.setOnSeekBarChangeListener(this);
+        mSicknessTitle = (TextView) view.findViewById(R.id.sickness_risk);
         mSicknessRiskBar = (SeekBar) view.findViewById(R.id.sickness_risk_bar);
-        mSicknessRiskBar.setOnFocusChangeListener(this);
+        mSicknessRiskBar.setOnSeekBarChangeListener(this);
+        mPhysHardTitle = (TextView) view.findViewById(R.id.physical_hardness_risk);
         mRiskPhysHardnessBar = (SeekBar) view.findViewById(R.id.physical_hardness_risk_bar);
-        mRiskPhysHardnessBar.setOnFocusChangeListener(this);
+        mRiskPhysHardnessBar.setOnSeekBarChangeListener(this);
+        mMentHardTitle = (TextView) view.findViewById(R.id.mental_hardness_risk);
         mRiskMentalHardnessBar = (SeekBar) view.findViewById(R.id.mental_hardness_risk_bar);
-        mRiskMentalHardnessBar.setOnFocusChangeListener(this);
+        mRiskMentalHardnessBar.setOnSeekBarChangeListener(this);
+        mProbabilityTitle = (TextView) view.findViewById(R.id.probability);
         mProbabilityBar = (SeekBar) view.findViewById(R.id.probability_bar);
-        mProbabilityBar.setOnFocusChangeListener(this);
+        mProbabilityBar.setOnSeekBarChangeListener(this);
+        mSolutionEasinessTitle = (TextView) view.findViewById(R.id.repair_easiness);
         mSolutionEasiness = (SeekBar) view.findViewById(R.id.repair_easiness_bar);
-        mSolutionEasiness.setOnFocusChangeListener(this);
+        mSolutionEasiness.setOnSeekBarChangeListener(this);
+        mSolutionCostTitle = (TextView) view.findViewById(R.id.repair_cost);
         mSolutionCost = (SeekBar) view.findViewById(R.id.repair_cost_bar);
-        mSolutionCost.setOnFocusChangeListener(this);
+        mSolutionCost.setOnSeekBarChangeListener(this);
 
         mExpandDescription = (ImageView) view.findViewById(R.id.expand_description);
         mExpandTargets = (ImageView) view.findViewById(R.id.expand_targets);
@@ -210,6 +227,20 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
         mProbabilityBar.setProgress(report.probability);
         mSolutionCost.setProgress(report.fixCost);
         mSolutionEasiness.setProgress(report.fixEasiness);
+        updateTitles();
+    }
+
+    private void updateTitles() {
+        mRiskEmployeesTitle.setText(Report.getEmployeesString(getActivity(), mRiskEmployeesBar.getProgress()));
+        mRiskUsersTitle.setText(Report.getUsersString(getActivity(), mRiskUsersBar.getProgress()));
+        mRiskThirdTitle.setText(Report.getThirdString(getActivity(), mRiskThirdBar.getProgress()));
+        mWoundRiskTitle.setText(Report.getWoundString(getActivity(), mWoundRiskBar.getProgress()));
+        mSicknessTitle.setText(Report.getSicknessString(getActivity(), mSicknessRiskBar.getProgress()));
+        mPhysHardTitle.setText(Report.getPhysicalHardnessString(getActivity(), mRiskPhysHardnessBar.getProgress()));
+        mMentHardTitle.setText(Report.getMentalHardnessString(getActivity(), mRiskMentalHardnessBar.getProgress()));
+        mProbabilityTitle.setText(Report.getProbabilityString(getActivity(), mProbabilityBar.getProgress()));
+        mSolutionCostTitle.setText(Report.getFixCostString(getActivity(), mSolutionCost.getProgress()));
+        mSolutionEasinessTitle.setText(Report.getFixeasinessString(getActivity(), mSolutionEasiness.getProgress()));
     }
 
     public void expand(final View frameView, final View layout) {
@@ -360,9 +391,18 @@ public class DescriptionFragment extends Fragment implements View.OnFocusChangeL
     }
 
     @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus)
-            updateData();
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        updateTitles();
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
     public interface OnUpdateReportListener {

@@ -370,7 +370,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         protected Void doInBackground(Report... reports) {
             createFolder();
             Report report = reports[0];
-            String filePath = report.writePDFReport(mReportFolder.getAbsolutePath());
+            String filePath = report.writePDFReport(mReportFolder.getAbsolutePath(), ReportActivity.this);
 
             Report.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
             return null;

@@ -288,7 +288,7 @@ public class ReportListFragment extends ListFragment {
             createFolder();
             ArrayList<String> files = new ArrayList<String>();
             for (Report report : reports[0]) {
-                String filePath = report.writePDFReport(mReportFolder.getAbsolutePath());
+                String filePath = report.writePDFReport(mReportFolder.getAbsolutePath(), getActivity());
                 files.add(filePath);
             }
 
