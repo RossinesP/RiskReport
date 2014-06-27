@@ -127,7 +127,7 @@ public class PicturesFragment extends Fragment {
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-
+                mPicturesAdapter.clearSelection();
             }
         });
     }

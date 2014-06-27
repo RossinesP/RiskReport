@@ -73,6 +73,11 @@ public class PictureListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void clearSelection() {
+        mSelected.clear();
+        notifyDataSetChanged();
+    }
+
     public ArrayList<String> getItems() {
         return mPictures;
     }

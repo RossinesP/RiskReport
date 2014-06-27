@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gridview_item_width">170dp</dimen>
+    <dimen name="gridview_item_height">170dp</dimen>
+    <dimen name="gridview_horizontal_item_padding">16dp</dimen>
+</resources>

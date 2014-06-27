@@ -214,6 +214,7 @@ public class ReportListFragment extends ListFragment {
             public void onDestroyActionMode(ActionMode mode) {
                 // Here you can make any necessary updates to the activity when
                 // the CAB is removed. By default, selected items are deselected/unchecked.
+                mAdapter.clearSelection();
             }
 
             @Override

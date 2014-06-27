@@ -85,6 +85,11 @@ public class ReportListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void clearSelection() {
+        mSelected.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return mReportsList.size();
@@ -162,8 +167,6 @@ public class ReportListAdapter extends BaseAdapter {
         viewHolder.root.setBackgroundColor(mSelected.contains(position) ?
                 mContext.getResources().getColor(android.R.color.darker_gray) :
                 mContext.getResources().getColor(android.R.color.transparent));
-
-
         return convertView;
     }
 

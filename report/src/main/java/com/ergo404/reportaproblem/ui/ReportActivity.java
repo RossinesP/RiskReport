@@ -227,7 +227,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
             mReport.pictures.add(mPictureToAdd.toString());
             mPictureToAdd = null;
             mPager.setCurrentItem(PICTURES_FRAGMENT_POS, true);
-            
+
             new UpdateReportTask().execute(mReport);
         }
 
