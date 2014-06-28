@@ -45,6 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:lines="1"
+                    android:inputType="textAutoComplete"
                     android:hint="@string/risk_name"/>
 
                 <EditText
@@ -53,12 +54,14 @@
                     android:layout_height="wrap_content"
                     android:minLines="3"
                     android:maxLines="4"
+                    android:inputType="textMultiLine"
                     android:hint="@string/risk_description"/>
 
                 <EditText
                     android:id="@+id/work_unit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="textAutoComplete"
                     android:lines="1"
                     android:hint="@string/work_unit"/>
 
@@ -66,6 +69,7 @@
                     android:id="@+id/work_place"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="textAutoComplete"
                     android:lines="1"
                     android:hint="@string/work_place"/>
             </LinearLayout>

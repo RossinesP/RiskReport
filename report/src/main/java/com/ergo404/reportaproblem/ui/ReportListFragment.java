@@ -32,6 +32,7 @@ import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.ui.adapters.ReportListAdapter;
+import com.ergo404.reportaproblem.utils.EmailUtils;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
@@ -288,11 +289,12 @@ public class ReportListFragment extends ListFragment {
             createFolder();
             ArrayList<String> files = new ArrayList<String>();
             for (Report report : reports[0]) {
-                String filePath = report.writePDFReport(mReportFolder.getAbsolutePath(), getActivity());
+                String filePath = report.writeHTMLReport(mReportFolder.getAbsolutePath(), getActivity());
                 files.add(filePath);
+                Log.v(TAG, "File to email : " + filePath);
             }
 
-            Report.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
+            EmailUtils.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
             return null;
         }
     }

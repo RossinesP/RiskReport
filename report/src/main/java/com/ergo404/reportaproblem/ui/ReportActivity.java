@@ -22,6 +22,7 @@ import android.view.View;
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
+import com.ergo404.reportaproblem.utils.EmailUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -370,9 +371,9 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         protected Void doInBackground(Report... reports) {
             createFolder();
             Report report = reports[0];
-            String filePath = report.writePDFReport(mReportFolder.getAbsolutePath(), ReportActivity.this);
+            String filePath = report.writeHTMLReport(mReportFolder.getAbsolutePath(), ReportActivity.this);
 
-            Report.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
+            EmailUtils.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
             return null;
         }
     }

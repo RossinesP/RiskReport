@@ -9,14 +9,23 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import com.ergo404.reportaproblem.utils.ZipUtils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import crl.android.pdfwriter.PDFWriter;
 import crl.android.pdfwriter.PaperSize;
@@ -212,6 +221,36 @@ public class Report {
         return getRatio(context, R.string.solution_simplicity, fixEasiness);
     }
 
+    private String generateHTML(Context context) {
+        StringBuilder htmlDoc = new StringBuilder();
+        htmlDoc.append("<!DOCTYPE html>");
+        htmlDoc.append("<html>");
+        htmlDoc.append("<head>");
+        htmlDoc.append("<meta charset=\"UTF-8\" />");
+        htmlDoc.append("<title>" + getTitleString(context, riskName) + "</title>");
+        htmlDoc.append("</head>");
+        htmlDoc.append("<body>");
+        htmlDoc.append("<h1>" + getTitleString(context, riskName) + "</h1>");
+        htmlDoc.append("<p>" + getDescriptionString(context, riskDescription) + "</p>");
+        htmlDoc.append("<p>" + getWorkPlaceString(context, workPlace) + "</p>");
+        htmlDoc.append("<p>" + getWorkUnitString(context, workUnit) + "</p>");
+        htmlDoc.append("<p>" + new SimpleDateFormat().format(new Date(date)) + "</p>");
+        htmlDoc.append("<p>" + getEmployeesString(context, riskEmployees) + "</p>");
+        htmlDoc.append("<p>" + getUsersString(context, riskUsers) + "</p>");
+        htmlDoc.append("<p>" + getThirdString(context, riskThirdParty) + "</p>");
+        htmlDoc.append("<p>" + getWoundString(context, woundRisk)+ "</p>");
+        htmlDoc.append("<p>" + getSicknessString(context, sicknessRisk) + "</p>");
+        htmlDoc.append("<p>" + getPhysicalHardnessString(context, physicalHardness) + "</p>");
+        htmlDoc.append("<p>" + getMentalHardnessString(context, mentalHardness) + "</p>");
+        htmlDoc.append("<p>" + getProbabilityString(context, probability) + "</p>");
+        htmlDoc.append("<p>" + getFixCostString(context, fixCost) + "</p>");
+        htmlDoc.append("<p>" + getFixeasinessString(context, fixEasiness) + "</p>");
+        for (String picture : pictures) {
+            htmlDoc.append("<p><img src=\"pictures/" + new File(picture).getName() + "\" /></p>");
+        }
+        htmlDoc.append("</body></html>");
+        return htmlDoc.toString();
+    }
     private String generatePDF(Context context) {
         PDFWriter writer = new PDFWriter(PaperSize.A4_WIDTH, PaperSize.A4_HEIGHT);
 
@@ -286,6 +325,70 @@ public class Report {
         return filePath;
     }
 
+    /**
+     * Creates a subfolder of folderPath with
+     * the html report and a subfolder with a copy of all the pictures
+     * from the report, then zips that subfolder and returns the path to the zip file
+     *
+     * @param folderPath the folder in which we want to create the zipfile
+     * @param context the Context
+     * @return the path to the generated zip file
+     */
+    public String writeHTMLReport(String folderPath, Context context) {
+        String subFolder = folderPath + File.separator + riskName + "-"
+                + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(date));
+        File folder = new File(subFolder);
+        if ((folder.exists() && !folder.isDirectory())
+                || (!folder.exists() && !folder.mkdirs())) {
+            Log.v(TAG, "Folder " + folder.getAbsolutePath() + " exists");
+            return null;
+        }
+
+        File picturesFolder = new File(folder, "pictures");
+        if ((picturesFolder.exists() && !picturesFolder.isDirectory())
+                || (!picturesFolder.exists() && !picturesFolder.mkdirs())) return null;
+        for (String picture : pictures) {
+            File src = new File(Uri.parse(picture).getPath());
+            File dest = new File (picturesFolder, src.getName());
+
+            Log.v(TAG, "Picture to copy : " + src.getAbsolutePath() + " to " + dest.getAbsolutePath());
+            try {
+                InputStream in = new FileInputStream(src);
+                OutputStream out = new FileOutputStream(dest);
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        File report = new File(folder, "report.html");
+        try {
+            report.createNewFile();
+            try {
+                FileOutputStream reportFile = new FileOutputStream(report);
+                reportFile.write(generateHTML(context).getBytes("UTF-8"));
+                reportFile.close();
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        String zipFile = new File(folderPath, folder.getName() + ".zip").getAbsolutePath();
+        ZipUtils.zipFileAtPath(folder.getPath(), zipFile);
+        return zipFile;
+    }
+
     public boolean isEmpty() {
         return riskName.isEmpty()
                 && riskDescription.isEmpty()
@@ -302,36 +405,5 @@ public class Report {
                 && probability == 0
                 && fixCost == 0
                 && fixEasiness == 0;
-    }
-
-    public static void email(Context context, String emailTo, String emailCC,
-                             String subject, String emailText, String filePath) {
-        ArrayList<String> files = new ArrayList<String>();
-        files.add(filePath);
-        Report.email(context, emailTo, emailCC, subject, emailText, files);
-    }
-
-    public static void email(Context context, String emailTo, String emailCC,
-                             String subject, String emailText, List<String> filePaths) {
-        //need to "send multiple" to get more than one attachment
-        final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND_MULTIPLE);
-        emailIntent.setType("text/plain");
-        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-                new String[]{emailTo});
-        emailIntent.putExtra(android.content.Intent.EXTRA_CC,
-                new String[]{emailCC});
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        emailIntent.putExtra(Intent.EXTRA_TEXT, emailText);
-        //has to be an ArrayList
-        ArrayList<Uri> uris = new ArrayList<Uri>();
-        //convert from paths to Android friendly Parcelable Uri's
-        for (String file : filePaths)
-        {
-            File fileIn = new File(file);
-            Uri u = Uri.fromFile(fileIn);
-            uris.add(u);
-        }
-        emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-        context.startActivity(Intent.createChooser(emailIntent, context.getString(R.string.report_sending_chooser)));
     }
 }
