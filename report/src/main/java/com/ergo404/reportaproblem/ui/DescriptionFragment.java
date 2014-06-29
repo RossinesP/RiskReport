@@ -1,8 +1,11 @@
 package com.ergo404.reportaproblem.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -25,6 +29,7 @@ import com.ergo404.reportaproblem.Report;
  */
 public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
     private final static String TAG = DescriptionFragment.class.getSimpleName();
+    private final static String EXTRA_CATEGORY = "category";
     private LinearLayout mDescriptionLayout;
     private LinearLayout mTargetsLayout;
     private LinearLayout mRisksLayout;
@@ -65,6 +70,13 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
     private ImageView mExpandTargets;
     private ImageView mExpandRisks;
     private ImageView mExpandFix;
+
+    private final static int CAT_DESCRIPTION = 0;
+    private final static int CAT_TARGETS = 1;
+    private final static int CAT_RISKS = 2;
+    private final static int CAT_SOLUTION = 3;
+
+    private int mCategory;
 
     @Override
     public void onAttach(Activity activity) {
@@ -131,9 +143,40 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         });
 
         mProblemName = (EditText) view.findViewById(R.id.risk_name);
+        mProblemName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                getActivity().getActionBar().setTitle(s.toString());
+            }
+        });
+
+        View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        };
+        mProblemName.setOnFocusChangeListener(focusChangeListener);
         mProblemDescription = (EditText) view.findViewById(R.id.problem_description);
+        mProblemDescription.setOnFocusChangeListener(focusChangeListener);
         mWorkPlace = (EditText) view.findViewById(R.id.work_place);
+        mWorkPlace.setOnFocusChangeListener(focusChangeListener);
         mWorkUnit = (EditText) view.findViewById(R.id.work_unit);
+        mWorkUnit.setOnFocusChangeListener(focusChangeListener);
 
         mRiskEmployeesTitle = (TextView) view.findViewById(R.id.employees_risk);
         mRiskEmployeesBar = (SeekBar) view.findViewById(R.id.employees_risk_bar);
@@ -170,6 +213,25 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         mExpandTargets = (ImageView) view.findViewById(R.id.expand_targets);
         mExpandRisks = (ImageView) view.findViewById(R.id.expand_risks);
         mExpandFix = (ImageView) view.findViewById(R.id.expand_fix);
+
+        int category = CAT_DESCRIPTION;
+        if (savedInstanceState != null) {
+            category = savedInstanceState.getInt(EXTRA_CATEGORY, CAT_DESCRIPTION);
+        }
+        switch (category) {
+            case CAT_DESCRIPTION:
+                expandDescription();
+                break;
+            case CAT_RISKS:
+                expandRisks();
+                break;
+            case CAT_SOLUTION:
+                expandFix();
+                break;
+            case CAT_TARGETS:
+                expandTargets();
+                break;
+        }
     }
 
     @Override
@@ -177,7 +239,6 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         super.onResume();
         Log.v(TAG, "onResume()");
         setReport(((ReportProvider) getActivity()).getReport());
-        expandDescription();
     }
 
     @Override
@@ -185,6 +246,12 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         super.onPause();
         Log.v(TAG, "onPause()");
         updateData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(EXTRA_CATEGORY, mCategory);
     }
 
     public void notifyReportUpdated() {
@@ -270,6 +337,7 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         a.setDuration(duration);
         layout.startAnimation(alpha);
         frameView.startAnimation(a);
+
     }
 
     public void collapse(final View frameView, final View layout) {
@@ -309,6 +377,7 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         collapseFix();
         collapseTargets();
         collapseRisks();
+        mCategory = CAT_DESCRIPTION;
     }
 
     private void collapseDescription() {
@@ -331,6 +400,7 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         collapseDescription();
         collapseRisks();
         collapseFix();
+        mCategory = CAT_TARGETS;
     }
 
     private void collapseTargets() {
@@ -353,6 +423,8 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         collapseDescription();
         collapseTargets();
         collapseFix();
+
+        mCategory = CAT_RISKS;
     }
 
     private void collapseRisks() {
@@ -375,6 +447,8 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         collapseDescription();
         collapseTargets();
         collapseRisks();
+
+        mCategory = CAT_SOLUTION;
     }
 
     private void collapseFix() {

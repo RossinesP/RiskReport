@@ -52,5 +52,10 @@
     <string name="send_report">Send</string>
     <string name="no_title">No title</string>
     <string name="undefined">Undefined</string>
+    <string name="nullrisk">Null</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="veryhigh">Very high</string>
 
 </resources>

@@ -147,12 +147,37 @@ public class Report {
 
     private static String getPercentage(Context context, int textRes, int value) {
         return context.getString(textRes).replace("%num", (value == 0)
-                ? context.getString(R.string.undefined) : (value - 1)*25 + "%");
+                ? context.getString(R.string.undefined) : "~" + (value - 1)*25 + "%");
     }
 
     private static String getRatio(Context context, int textRes, int value) {
         return context.getString(textRes).replace("%num", (value == 0)
                 ? context.getString(R.string.undefined) : (value - 1) + "/4");
+    }
+
+    private static String getStrength(Context context, int textRes, int value) {
+        String replaceString = "";
+        switch (value) {
+            case 0:
+                replaceString = context.getString(R.string.undefined);
+                break;
+            case 1:
+                replaceString = context.getString(R.string.nullrisk);
+                break;
+            case 2:
+                replaceString = context.getString(R.string.low);
+                break;
+            case 3:
+                replaceString = context.getString(R.string.medium);
+                break;
+            case 4:
+                replaceString = context.getString(R.string.high);
+                break;
+            case 5:
+                replaceString = context.getString(R.string.veryhigh);
+                break;
+        }
+        return context.getString(textRes).replace("%num", replaceString);
     }
 
     public static String getTitleString(Context context, String title) {
@@ -182,43 +207,43 @@ public class Report {
     }
 
     public static String getEmployeesString(Context context, int riskEmployees) {
-        return getRatio(context, R.string.number_employees, riskEmployees);
+        return getPercentage(context, R.string.number_employees, riskEmployees);
     }
 
     public static String getThirdString(Context context, int riskThirdParty) {
-        return getRatio(context, R.string.number_third, riskThirdParty);
+        return getPercentage(context, R.string.number_third, riskThirdParty);
     }
 
     public static String getUsersString(Context context, int riskUsers) {
-        return getRatio(context, R.string.number_users, riskUsers);
+        return getPercentage(context, R.string.number_users, riskUsers);
     }
 
     public static String getWoundString(Context context, int woundRisk) {
-        return getRatio(context, R.string.possible_wound, woundRisk);
+        return getStrength(context, R.string.possible_wound, woundRisk);
     }
 
     public static String getSicknessString(Context context, int sicknessRisk) {
-        return getRatio(context, R.string.possible_sickness, sicknessRisk);
+        return getStrength(context, R.string.possible_sickness, sicknessRisk);
     }
 
     public static String getPhysicalHardnessString(Context context, int physicalHardness) {
-        return getRatio(context, R.string.physical_hardness, physicalHardness);
+        return getStrength(context, R.string.physical_hardness, physicalHardness);
     }
 
     public static String getMentalHardnessString(Context context, int mentalHardness) {
-        return getRatio(context, R.string.mental_hardness, mentalHardness);
+        return getStrength(context, R.string.mental_hardness, mentalHardness);
     }
 
     public static String getProbabilityString(Context context, int probability) {
-        return getRatio(context, R.string.risk_probability, probability);
+        return getStrength(context, R.string.risk_probability, probability);
     }
 
     public static String getFixCostString(Context context, int fixCost) {
-        return getRatio(context, R.string.solution_cost, fixCost);
+        return getStrength(context, R.string.solution_cost, fixCost);
     }
 
     public static String getFixeasinessString(Context context, int fixEasiness) {
-        return getRatio(context, R.string.solution_simplicity, fixEasiness);
+        return getStrength(context, R.string.solution_simplicity, fixEasiness);
     }
 
     private String generateHTML(Context context) {
