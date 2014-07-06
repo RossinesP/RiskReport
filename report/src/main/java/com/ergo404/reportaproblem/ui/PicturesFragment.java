@@ -67,7 +67,6 @@ public class PicturesFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v(TAG, "onActivityCreated");
         mPicturesAdapter = new PictureListAdapter(getActivity());
         OnDismissCallback mDismissCallback = new OnDismissCallback() {
             @Override
@@ -145,7 +144,6 @@ public class PicturesFragment extends Fragment {
     }
 
     public void notifyReportUpdated() {
-        Log.v(TAG, "notifyReportUpdated called");
         if (isResumed()) {
             setReport(((ReportProvider) getActivity()).getReport());
         }

@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.ergo404.reportaproblem.BuildConfig;
 import com.ergo404.reportaproblem.Report;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -96,6 +99,16 @@ public class ReportDbHandler {
     public boolean deleteReport(long sqlId) {
         openDatabase();
 
+        Report report = getReport(sqlId);
+        for (String picture : report.pictures) {
+            if (BuildConfig.DEBUG) Log.v(TAG, "Deleting picture " + picture);
+            File f = new File(Uri.parse(picture).getPath());
+            if (f.delete()) {
+                if (BuildConfig.DEBUG) Log.v(TAG, "Picture deleted");
+            } else {
+                if (BuildConfig.DEBUG) Log.v(TAG, "Error while deleting picture");
+            }
+        }
         int affected = mDb.delete(ReportDbHelper.TABLE_REPORTS, ReportDbHelper.KEY_ID + "=?",
                 new String[] { String.valueOf(sqlId) });
 
@@ -110,7 +123,7 @@ public class ReportDbHandler {
         boolean result = true;
         for (Long sqlId : reportsIds) {
             result &= deleteReport(sqlId);
-            if (result) Log.v(TAG, "Deleted report " + sqlId);
+            if (result) Log.i(TAG, "Deleted report " + sqlId);
         }
         return result;
     }

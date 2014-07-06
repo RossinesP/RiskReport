@@ -22,6 +22,7 @@ import android.view.View;
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
+import com.ergo404.reportaproblem.utils.Constants;
 import com.ergo404.reportaproblem.utils.EmailUtils;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     private Uri mLastAskedPicture;
     private Uri mPictureToAdd;
 
-    private final File mReportFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "RiskReport");
+
     private final static int DESCRIPTION_FRAGMENT_POS = 0;
     private final static int PICTURES_FRAGMENT_POS = 1;
     private ViewPager mPager;
@@ -137,10 +138,8 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     protected void onStop() {
         super.onStop();
         if (mReport.isEmpty()) {
-            Log.v(TAG, "Deleting the empty report");
             new DeleteReportTask().execute(mReport);
         } else {
-            Log.v(TAG, "Saving the report");
             new UpdateReportTask().execute(mReport);
         }
     }
@@ -168,7 +167,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.v(TAG, "onSaveInstanceState()");
         mReport.writeReport(outState);
 
         if (mLastAskedPicture != null) {
@@ -219,12 +217,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     }
 
     private void setReport(final Report report) {
-        Log.v(TAG, "setReport called with id " + report.sqlId + ", report title is " + report.riskName);
         mReport = report;
         getActionBar().setTitle(mReport.riskName);
 
         if (mPictureToAdd != null) {
-            Log.v(TAG, "Added a picture !");
             mReport.pictures.add(mPictureToAdd.toString());
             mPictureToAdd = null;
             mPager.setCurrentItem(PICTURES_FRAGMENT_POS, true);
@@ -245,7 +241,7 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            if (createFolder() != null) {
+            if (Constants.createReportDir()) {
                 // Create the File where the photo should go
                 File photoFile = null;
                 try {
@@ -264,18 +260,13 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         }
     }
 
-    private File createFolder() {
-        boolean result = (mReportFolder.mkdirs() || mReportFolder.isDirectory());
-        return result ? mReportFolder : null;
-    }
-
     private File createImageFile() throws IOException {
         String imageFileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
-                mReportFolder      /* directory */
+                Constants.REPORT_DIR      /* directory */
         );
 
         return image;
@@ -369,9 +360,9 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
         @Override
         protected Void doInBackground(Report... reports) {
-            createFolder();
+            Constants.createReportDir();
             Report report = reports[0];
-            String filePath = report.writeHTMLReport(mReportFolder.getAbsolutePath(), ReportActivity.this);
+            String filePath = report.writeHTMLReport(Constants.REPORT_DIR.getAbsolutePath(), ReportActivity.this);
 
             EmailUtils.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
             return null;
@@ -382,12 +373,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.i(TAG, "Loading the report from the DB");
         }
 
         @Override
         protected Report doInBackground(Long... params) {
-            Log.v(TAG, "Loading report with id " + params[0]);
             ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
             Report result = dbHandler.getReport(params[0]);
             dbHandler.closeDatabase();
@@ -397,7 +386,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPostExecute(Report report) {
             super.onPostExecute(report);
-            Log.i(TAG, "Loaded report with id " + report.sqlId);
             setReport(report);
         }
     }
@@ -406,13 +394,11 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.i(TAG , "Saving the report to the DB");
         }
 
         @Override
         protected Long doInBackground(final Report... params) {
             Report report = params[0];
-            Log.v(TAG, "Saving report with id " + report.sqlId + " and name " + report.riskName);
             ReportDbHandler dbHandler = ReportDbHandler.getInstance(ReportActivity.this);
             long result = dbHandler.addOrUpdateReport(report);
             dbHandler.closeDatabase();
@@ -427,7 +413,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPostExecute(Long sqlId) {
             super.onPostExecute(sqlId);
-            Log.v(TAG, "Report saved, id = " + sqlId);
             mReport.sqlId = sqlId;
             setReport(mReport);
         }
@@ -438,22 +423,14 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.i(TAG , "Deleting the report from the DB");
         }
 
         @Override
         protected Boolean doInBackground(Report... params) {
-            Log.v(TAG , "Deleting report with id " + params[0].sqlId + " and name " + params[0].riskName);
             ReportDbHandler handler = ReportDbHandler.getInstance(ReportActivity.this);
             boolean result = handler.deleteReport(params[0].sqlId);
             handler.closeDatabase();
             return result;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean deleted) {
-            super.onPostExecute(deleted);
-            Log.v(TAG , "Report deleted");
         }
     }
 }

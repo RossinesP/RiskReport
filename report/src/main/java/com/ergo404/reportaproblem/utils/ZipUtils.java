@@ -62,7 +62,6 @@ public class ZipUtils {
                 String unmodifiedFilePath = file.getPath();
                 String relativePath = unmodifiedFilePath
                         .substring(basePathLength);
-                Log.i("ZIP SUBFOLDER", "Relative Path : " + relativePath);
                 FileInputStream fi = new FileInputStream(unmodifiedFilePath);
                 origin = new BufferedInputStream(fi, BUFFER);
                 ZipEntry entry = new ZipEntry(relativePath);

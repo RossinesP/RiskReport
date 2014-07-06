@@ -129,7 +129,6 @@ public class ReportListAdapter extends BaseAdapter {
         String date = mDateFormatter.format(new Date(report.date));
         viewHolder.riskDate.setText(date);
 
-        Log.v(TAG, "Report name : " + report.riskName + ", pictures : " +report.pictures.size());
         if (report.pictures.size() > 0) {
             viewHolder.riskPicture.setVisibility(View.VISIBLE);
             final String path = report.pictures.get(0);

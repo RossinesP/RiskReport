@@ -291,7 +291,6 @@ public class ReportListFragment extends ListFragment {
             for (Report report : reports[0]) {
                 String filePath = report.writeHTMLReport(mReportFolder.getAbsolutePath(), getActivity());
                 files.add(filePath);
-                Log.v(TAG, "File to email : " + filePath);
             }
 
             EmailUtils.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
@@ -316,7 +315,6 @@ public class ReportListFragment extends ListFragment {
             for (int i = 0; i < mAdapter.getCount(); i++) {
                 selected.add(checkedItems.get(i, false));
             }
-            Log.v(TAG, "UpdateListTask : selected size if " + selected.size() + " list size is " + list.size());
             mAdapter.updateReportsList(list);
             //updateGridView();
         }

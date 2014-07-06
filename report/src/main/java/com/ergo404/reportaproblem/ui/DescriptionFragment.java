@@ -237,14 +237,12 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
     @Override
     public void onResume() {
         super.onResume();
-        Log.v(TAG, "onResume()");
         setReport(((ReportProvider) getActivity()).getReport());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.v(TAG, "onPause()");
         updateData();
     }
 
@@ -255,7 +253,6 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
     }
 
     public void notifyReportUpdated() {
-        Log.v(TAG, "notifyReportUpdated called");
         if (isResumed()) {
             setReport(((ReportProvider) getActivity()).getReport());
         }

@@ -318,7 +318,6 @@ public class Report {
         i++;
 
         for (String picture : pictures) {
-            Log.v(TAG, picture);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 8;
             Bitmap bmp = BitmapFactory.decodeFile(Uri.parse(picture).getPath(), options);
@@ -365,7 +364,6 @@ public class Report {
         File folder = new File(subFolder);
         if ((folder.exists() && !folder.isDirectory())
                 || (!folder.exists() && !folder.mkdirs())) {
-            Log.v(TAG, "Folder " + folder.getAbsolutePath() + " exists");
             return null;
         }
 
@@ -376,7 +374,6 @@ public class Report {
             File src = new File(Uri.parse(picture).getPath());
             File dest = new File (picturesFolder, src.getName());
 
-            Log.v(TAG, "Picture to copy : " + src.getAbsolutePath() + " to " + dest.getAbsolutePath());
             try {
                 InputStream in = new FileInputStream(src);
                 OutputStream out = new FileOutputStream(dest);

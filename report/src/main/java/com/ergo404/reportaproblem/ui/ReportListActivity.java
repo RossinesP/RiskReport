@@ -26,7 +26,13 @@ public class ReportListActivity extends FragmentActivity implements ReportCreato
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reportlist);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent cleanPicturesService = new Intent(this, PictureCleanerService.class);
+        startService(cleanPicturesService);
     }
 
     @Override
@@ -61,7 +67,6 @@ public class ReportListActivity extends FragmentActivity implements ReportCreato
         @Override
         protected void onPostExecute(Long sqlid) {
             super.onPostExecute(sqlid);
-            Log.v(TAG, "Starting the Report activity with attached sqlid " + sqlid);
             Intent reportI = new Intent(ReportListActivity.this, ReportActivity.class);
             reportI.putExtra(ReportActivity.EXTRA_REPORTID, sqlid);
             startActivity(reportI);
