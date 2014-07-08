@@ -361,9 +361,11 @@ public class Report {
     public String writeHTMLReport(String folderPath, Context context) {
         String subFolder = folderPath + File.separator + riskName + "-"
                 + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(date));
+        if (BuildConfig.DEBUG) Log.i(TAG, "writeHTMLReport to " + subFolder);
         File folder = new File(subFolder);
         if ((folder.exists() && !folder.isDirectory())
                 || (!folder.exists() && !folder.mkdirs())) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "Folder could not be created");
             return null;
         }
 
@@ -373,7 +375,7 @@ public class Report {
         for (String picture : pictures) {
             File src = new File(Uri.parse(picture).getPath());
             File dest = new File (picturesFolder, src.getName());
-
+            if (BuildConfig.DEBUG) Log.i(TAG, "Copying " + src + " to " + dest);
             try {
                 InputStream in = new FileInputStream(src);
                 OutputStream out = new FileOutputStream(dest);
@@ -386,6 +388,7 @@ public class Report {
                 in.close();
                 out.close();
             } catch (IOException e) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "Did not work");
                 e.printStackTrace();
                 return null;
             }
@@ -402,12 +405,14 @@ public class Report {
                 e.printStackTrace();
             }
         } catch (IOException e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "Could not create the " + report.getAbsolutePath() + " file");
             e.printStackTrace();
             return null;
         }
 
         String zipFile = new File(folderPath, folder.getName() + ".zip").getAbsolutePath();
-        ZipUtils.zipFileAtPath(folder.getPath(), zipFile);
+        if (BuildConfig.DEBUG) Log.i(TAG, "Ziping folder " + folder.getAbsolutePath() +  " to file " + zipFile);
+        ZipUtils.zipFileAtPath(folder, zipFile);
         return zipFile;
     }
 

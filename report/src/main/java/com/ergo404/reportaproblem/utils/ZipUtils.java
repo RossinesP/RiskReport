@@ -2,6 +2,8 @@ package com.ergo404.reportaproblem.utils;
 
 import android.util.Log;
 
+import com.ergo404.reportaproblem.BuildConfig;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -15,12 +17,10 @@ import java.util.zip.ZipOutputStream;
  * Created by pierrerossines on 28/06/2014.
  */
 public class ZipUtils {
-    public static boolean zipFileAtPath(String sourcePath, String toLocation) {
+    public static boolean zipFileAtPath(File sourceFile, String toLocation) {
         // ArrayList<String> contentList = new ArrayList<String>();
         final int BUFFER = 2048;
 
-
-        File sourceFile = new File(sourcePath);
         try {
             BufferedInputStream origin = null;
             FileOutputStream dest = new FileOutputStream(toLocation);
@@ -30,9 +30,9 @@ public class ZipUtils {
                 zipSubFolder(out, sourceFile, sourceFile.getParent().length());
             } else {
                 byte data[] = new byte[BUFFER];
-                FileInputStream fi = new FileInputStream(sourcePath);
+                FileInputStream fi = new FileInputStream(sourceFile);
                 origin = new BufferedInputStream(fi, BUFFER);
-                ZipEntry entry = new ZipEntry(getLastPathComponent(sourcePath));
+                ZipEntry entry = new ZipEntry(getLastPathComponent(sourceFile));
                 out.putNextEntry(entry);
                 int count;
                 while ((count = origin.read(data, 0, BUFFER)) != -1) {
@@ -61,7 +61,8 @@ public class ZipUtils {
                 byte data[] = new byte[BUFFER];
                 String unmodifiedFilePath = file.getPath();
                 String relativePath = unmodifiedFilePath
-                        .substring(basePathLength);
+                        .substring(basePathLength + 1);
+
                 FileInputStream fi = new FileInputStream(unmodifiedFilePath);
                 origin = new BufferedInputStream(fi, BUFFER);
                 ZipEntry entry = new ZipEntry(relativePath);
@@ -75,8 +76,8 @@ public class ZipUtils {
         }
     }
 
-    public static String getLastPathComponent(String filePath) {
-        String[] segments = filePath.split("/");
+    public static String getLastPathComponent(File file) {
+        String[] segments = file.getAbsolutePath().split("/");
         String lastPathComponent = segments[segments.length - 1];
         return lastPathComponent;
     }
