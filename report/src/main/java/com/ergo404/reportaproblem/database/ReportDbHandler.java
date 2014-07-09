@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.ergo404.reportaproblem.BuildConfig;
 import com.ergo404.reportaproblem.Report;
+import com.ergo404.reportaproblem.utils.Constants;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -103,10 +104,14 @@ public class ReportDbHandler {
         for (String picture : report.pictures) {
             if (BuildConfig.DEBUG) Log.v(TAG, "Deleting picture " + picture);
             File f = new File(Uri.parse(picture).getPath());
-            if (f.delete()) {
-                if (BuildConfig.DEBUG) Log.v(TAG, "Picture deleted");
+            if (f.getAbsolutePath().contains(Constants.REPORT_DIR.getAbsolutePath())) {
+                if (f.delete()) {
+                    if (BuildConfig.DEBUG) Log.v(TAG, "Picture deleted");
+                } else {
+                    if (BuildConfig.DEBUG) Log.v(TAG, "Error while deleting picture");
+                }
             } else {
-                if (BuildConfig.DEBUG) Log.v(TAG, "Error while deleting picture");
+                if (BuildConfig.DEBUG) Log.v(TAG, "Did not delete that picture because it is not in our folder");
             }
         }
         int affected = mDb.delete(ReportDbHelper.TABLE_REPORTS, ReportDbHelper.KEY_ID + "=?",

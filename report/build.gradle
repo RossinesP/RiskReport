@@ -12,11 +12,9 @@ android {
     buildTypes {
         release {
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         debug {
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             applicationIdSuffix 'debug'
 
         }
@@ -26,8 +24,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:19.+'
+    compile 'com.android.support:support-v13:20.+'
     compile 'com.nhaarman.listviewanimations:library:2.6.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':pdfWriter')
 }

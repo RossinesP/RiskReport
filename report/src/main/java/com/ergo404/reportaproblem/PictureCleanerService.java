@@ -1,19 +1,16 @@
-package com.ergo404.reportaproblem.ui;
+package com.ergo404.reportaproblem;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.graphics.Picture;
 import android.net.Uri;
 import android.util.Log;
 
-import com.ergo404.reportaproblem.BuildConfig;
-import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.utils.Constants;
+import com.ergo404.reportaproblem.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Pierre on 05/07/2014.
@@ -58,6 +55,9 @@ public class PictureCleanerService extends IntentService {
             if (f.isFile() && f.getAbsolutePath().toLowerCase().matches(".*[.]{1}(jpeg|jpg)")) {
                 if (BuildConfig.DEBUG) Log.v(TAG, "Is an image file");
                 pictureFiles.add(Uri.fromFile(f).toString());
+            } else {
+                if (BuildConfig.DEBUG) Log.v(TAG, "Deleting file " + f);
+                FileUtils.delete(f);
             }
         }
 

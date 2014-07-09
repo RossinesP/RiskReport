@@ -1,1 +1,1 @@
-include ':report', ':pdfWriter'
+include ':report'

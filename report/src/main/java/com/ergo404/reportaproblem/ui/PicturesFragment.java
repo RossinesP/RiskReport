@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.ui.adapters.PictureListAdapter;
+import com.ergo404.reportaproblem.utils.Constants;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
@@ -39,7 +40,7 @@ public class PicturesFragment extends Fragment {
     private GridView mGridView;
     private PictureListAdapter mPicturesAdapter;
     private AnimateDismissAdapter mAnimateDismissAdapter;
-
+    private TextView mEmptyText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_pictures, container, false);
@@ -50,39 +51,30 @@ public class PicturesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mGridView = (GridView) view.findViewById(R.id.picturesGrid);
 
-        final TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
+        mEmptyText = (TextView) view.findViewById(R.id.empty_text);
         String emptyTextS = getString(R.string.picturelist_empty);
         int imgPos = emptyTextS.indexOf("%image");
         SpannableString spannable = new SpannableString(emptyTextS);
         ImageSpan imgSpan = new ImageSpan(getActivity(), R.drawable.ic_action_camera_light);
         spannable.setSpan(imgSpan, imgPos, imgPos + "%image".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        emptyText.setText(spannable);
-        emptyText.setOnClickListener(new View.OnClickListener() {
+        mEmptyText.setText(spannable);
+        mEmptyText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((PictureTaker) getActivity()).takePicture();
             }
         });
-
-        mGridView.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
-            @Override
-            public void onChildViewAdded(View parent, View child) {
-
-            }
-
-            @Override
-            public void onChildViewRemoved(View parent, View child) {
-                if (mGridView.getCount() == 0) {
-                    emptyText.setVisibility(View.VISIBLE);
-                    mGridView.setVisibility(View.GONE);
-                } else {
-                    emptyText.setVisibility(View.GONE);
-                    mGridView.setVisibility(View.VISIBLE);
-                }
-            }
-        });
     }
 
+    private void updateLayout() {
+        if (mPicturesAdapter.getCount() == 0) {
+            mEmptyText.setVisibility(View.VISIBLE);
+            mGridView.setVisibility(View.GONE);
+        } else {
+            mEmptyText.setVisibility(View.GONE);
+            mGridView.setVisibility(View.VISIBLE);
+        }
+    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -171,6 +163,7 @@ public class PicturesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setReport(((ReportProvider) getActivity()).getReport());
+        updateLayout();
     }
 
     @Override
@@ -218,6 +211,7 @@ public class PicturesFragment extends Fragment {
 
     private void setReport(Report report) {
         mPicturesAdapter.updatePictures(report.pictures);
+        updateLayout();
     }
 
     private class DeletePictureTask extends AsyncTask<String, Void, Boolean> {
@@ -225,11 +219,14 @@ public class PicturesFragment extends Fragment {
         @Override
         protected Boolean doInBackground(String... params) {
             String path = params[0];
-            Log.i(TAG, "Deleting picture " + Uri.parse(path).getPath());
-            File pictureF = new File(Uri.parse(path).getPath());
-            boolean result = pictureF.delete();
-            if (!result) {
-                Log.e(TAG, "Could not delete picture " + Uri.parse(path).getPath());
+            boolean result = false;
+            if (path.contains(Constants.REPORT_DIR.getAbsolutePath())) {
+                Log.i(TAG, "Deleting picture " + Uri.parse(path).getPath());
+                File pictureF = new File(Uri.parse(path).getPath());
+                result = pictureF.delete();
+                if (!result) {
+                    Log.e(TAG, "Could not delete picture " + Uri.parse(path).getPath());
+                }
             }
             return result;
         }

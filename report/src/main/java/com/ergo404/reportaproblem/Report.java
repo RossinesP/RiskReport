@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import com.ergo404.reportaproblem.utils.FileUtils;
 import com.ergo404.reportaproblem.utils.ZipUtils;
 
 import java.io.BufferedInputStream;
@@ -27,9 +28,11 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/*
 import crl.android.pdfwriter.PDFWriter;
 import crl.android.pdfwriter.PaperSize;
 import crl.android.pdfwriter.StandardFonts;
+*/
 
 /**
  * Created by pierrerossines on 07/06/2014.
@@ -271,11 +274,12 @@ public class Report {
         htmlDoc.append("<p>" + getFixCostString(context, fixCost) + "</p>");
         htmlDoc.append("<p>" + getFixeasinessString(context, fixEasiness) + "</p>");
         for (String picture : pictures) {
-            htmlDoc.append("<p><img src=\"pictures/" + new File(picture).getName() + "\" /></p>");
+            htmlDoc.append("<p><img src=\"pictures/" + new File(picture).getName() + "\" width=\"600px\"/></p>");
         }
         htmlDoc.append("</body></html>");
         return htmlDoc.toString();
     }
+    /*
     private String generatePDF(Context context) {
         PDFWriter writer = new PDFWriter(PaperSize.A4_WIDTH, PaperSize.A4_HEIGHT);
 
@@ -347,7 +351,7 @@ public class Report {
             e.printStackTrace();
         }
         return filePath;
-    }
+    }*/
 
     /**
      * Creates a subfolder of folderPath with
@@ -413,6 +417,7 @@ public class Report {
         String zipFile = new File(folderPath, folder.getName() + ".zip").getAbsolutePath();
         if (BuildConfig.DEBUG) Log.i(TAG, "Ziping folder " + folder.getAbsolutePath() +  " to file " + zipFile);
         ZipUtils.zipFileAtPath(folder, zipFile);
+        FileUtils.delete(folder);
         return zipFile;
     }
 
