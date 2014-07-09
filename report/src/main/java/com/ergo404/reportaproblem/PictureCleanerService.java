@@ -55,7 +55,7 @@ public class PictureCleanerService extends IntentService {
             if (f.isFile() && f.getAbsolutePath().toLowerCase().matches(".*[.]{1}(jpeg|jpg)")) {
                 if (BuildConfig.DEBUG) Log.v(TAG, "Is an image file");
                 pictureFiles.add(Uri.fromFile(f).toString());
-            } else {
+            } else if (!f.getName().equals(".nomedia")) {
                 if (BuildConfig.DEBUG) Log.v(TAG, "Deleting file " + f);
                 FileUtils.delete(f);
             }
