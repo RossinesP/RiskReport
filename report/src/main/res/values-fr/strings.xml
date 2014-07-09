@@ -40,13 +40,14 @@
     <string name="delete_report">Supprimer</string>
     <string name="toast_report_deleted">Rapport(s) supprimé(s)</string>
     <string name="menu_createreport">Nouveau rapport</string>
-    <string name="reportlist_empty">Cliquez sur image pour créer un nouveau rapport</string>
+    <string name="reportlist_empty">Cliquez sur %image pour créer un nouveau rapport</string>
     <string name="select_all">Tout sélectionner</string>
     <string name="items_selected">%nb items sélectionnés</string>
     <string name="reports_selected">%nb rapport(s) sélectionné(s)</string>
     <string name="pictures_selected">%nb photo(s) sélectionné(s)</string>
     <string name="add_picture">Ajouter une photo</string>
     <string name="toast_image_deleted">Photo(s) supprimée</string>
+    <string name="picturelist_empty">Cliquez sur %image pour prendre une photo</string>
 
     <string name="send_report">Envoyer</string>
     <string name="no_title">Pas de titre</string>

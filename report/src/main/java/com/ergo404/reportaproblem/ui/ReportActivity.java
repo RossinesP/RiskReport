@@ -34,7 +34,7 @@ import java.util.Date;
 /**
  * Created by pierrerossines on 09/06/2014.
  */
-public class ReportActivity extends FragmentActivity implements DescriptionFragment.OnUpdateReportListener, PicturesFragment.OnPictureUpdatedListener, ReportProvider {
+public class ReportActivity extends FragmentActivity implements DescriptionFragment.OnUpdateReportListener, PicturesFragment.OnPictureUpdatedListener, ReportProvider, PictureTaker {
     public final static String EXTRA_REPORTID = "reportid";
 
     private final static String EXTRA_LASTPICTURE = "lastPicture";
@@ -172,6 +172,11 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         if (mLastAskedPicture != null) {
             outState.putString(EXTRA_LASTPICTURE, mLastAskedPicture.toString());
         }
+    }
+
+    @Override
+    public void takePicture() {
+        dispatchTakePictureIntent();
     }
 
     @Override

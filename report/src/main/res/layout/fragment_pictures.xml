@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:id="@+id/picturesGrid"
-    android:columnWidth="@dimen/gridview_item_width"
-    android:numColumns="auto_fit"
-    android:padding="8dp"
-    android:verticalSpacing="8dp"
-    android:horizontalSpacing="8dp"
-    android:gravity="center_horizontal"/>
+    android:layout_width="match_parent"
+    android:padding="8dp">
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/picturesGrid"
+        android:columnWidth="@dimen/gridview_item_width"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
+        android:gravity="center_horizontal"/>
 
+    <TextView
+        android:id="@+id/empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/picturelist_empty"
+        style="@android:style/TextAppearance.Holo.Medium"/>
+</FrameLayout>

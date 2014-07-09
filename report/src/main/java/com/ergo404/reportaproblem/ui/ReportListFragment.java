@@ -89,10 +89,10 @@ public class ReportListFragment extends ListFragment {
 
         TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
         String emptyTextS = getString(R.string.reportlist_empty);
-        int imgPos = emptyTextS.indexOf("image");
+        int imgPos = emptyTextS.indexOf("%image");
         SpannableString spannable = new SpannableString(emptyTextS);
         ImageSpan imgSpan = new ImageSpan(getActivity(), R.drawable.ic_action_new_event);
-        spannable.setSpan(imgSpan, imgPos, imgPos + 5, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(imgSpan, imgPos, imgPos + "%image".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         emptyText.setText(spannable);
         emptyText.setOnClickListener(new View.OnClickListener() {
             @Override

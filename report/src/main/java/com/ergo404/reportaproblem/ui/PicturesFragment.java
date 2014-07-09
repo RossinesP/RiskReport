@@ -5,6 +5,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ergo404.reportaproblem.R;
@@ -45,6 +49,38 @@ public class PicturesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mGridView = (GridView) view.findViewById(R.id.picturesGrid);
+
+        final TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
+        String emptyTextS = getString(R.string.picturelist_empty);
+        int imgPos = emptyTextS.indexOf("%image");
+        SpannableString spannable = new SpannableString(emptyTextS);
+        ImageSpan imgSpan = new ImageSpan(getActivity(), R.drawable.ic_action_camera_light);
+        spannable.setSpan(imgSpan, imgPos, imgPos + "%image".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        emptyText.setText(spannable);
+        emptyText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((PictureTaker) getActivity()).takePicture();
+            }
+        });
+
+        mGridView.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View parent, View child) {
+
+            }
+
+            @Override
+            public void onChildViewRemoved(View parent, View child) {
+                if (mGridView.getCount() == 0) {
+                    emptyText.setVisibility(View.VISIBLE);
+                    mGridView.setVisibility(View.GONE);
+                } else {
+                    emptyText.setVisibility(View.GONE);
+                    mGridView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
