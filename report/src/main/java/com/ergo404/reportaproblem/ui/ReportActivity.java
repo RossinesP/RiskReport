@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.crypto.SecretKey;
+
 /**
  * Created by pierrerossines on 09/06/2014.
  */
@@ -584,7 +586,17 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         }
     }
 
-    private class GenerateAndSendReport extends AsyncTask<Report, Void, Void> {
+    private class GenerateAndSendReport extends AsyncTask<Report, Integer, Void> implements ExportDialogFragment.OnDismissListener {
+        private ExportDialogFragment exportDialogFragment;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            exportDialogFragment = ExportDialogFragment.getInstance();
+            exportDialogFragment.setNumReports(1);
+            exportDialogFragment.setDismissListener(this);
+            exportDialogFragment.show(getFragmentManager(), "exportDialog");
+        }
 
         @Override
         protected Void doInBackground(Report... reports) {
@@ -592,8 +604,27 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
             Report report = reports[0];
             String filePath = report.writeHTMLReport(Constants.REPORT_DIR.getAbsolutePath(), ReportActivity.this);
 
+            if (isCancelled()) return null;
             EmailUtils.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
             return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            exportDialogFragment.setProgress(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            exportDialogFragment.dismiss();
+        }
+
+        @Override
+        public void onDismiss() {
+            if (BuildConfig.DEBUG) Log.v(TAG, "Progress dialog dismissed");
+            cancel(true);
         }
     }
 

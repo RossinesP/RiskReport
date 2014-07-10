@@ -4,16 +4,32 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.ergo404.reportaproblem.R;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by Pierre on 09/07/2014.
  */
 public class ExportDialogFragment extends DialogFragment {
 
+    private static ExportDialogFragment sInstance;
+
+    public static ExportDialogFragment getInstance() {
+        if (sInstance == null) sInstance = new ExportDialogFragment();
+        return sInstance;
+    }
+
+    public ExportDialogFragment() {
+
+    }
+
     private int mNumReports;
+
+    private WeakReference<OnDismissListener> mListener;
 
     public void setNumReports(int numReports) {
         mNumReports = numReports;
@@ -23,16 +39,33 @@ public class ExportDialogFragment extends DialogFragment {
         ((ProgressDialog) getDialog()).setProgress(progress);
     }
 
+    public void setDismissListener (OnDismissListener listener) {
+         mListener = new WeakReference<OnDismissListener>(listener);
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        ProgressDialog.Builder builder = new ProgressDialog.Builder(getActivity());
+        final ProgressDialog dialog = new ProgressDialog(getActivity());
         if (mNumReports == 1) {
-            builder.setTitle(R.string.creating_report);
+            dialog.setTitle(R.string.creating_report);
+            dialog.setMessage(getString(R.string.creating_report));
         } else {
-            builder.setTitle(R.string.creating_reports);
+            dialog.setTitle(R.string.creating_reports);
+            dialog.setMessage(getString(R.string.creating_reports));
         }
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setIndeterminate(true);
+        return dialog;
+    }
 
-        return builder.create();
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (mListener != null && mListener.get() != null) mListener.get().onDismiss();
+    }
+
+    public interface OnDismissListener {
+        public void onDismiss();
     }
 }

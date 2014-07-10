@@ -52,7 +52,7 @@
     <string name="send_report">Envoyer</string>
     <string name="no_title">Pas de titre</string>
     <string name="undefined">Non défini</string>
-    <string name="nullrisk">Nul</string>
+    <string name="nullrisk">Nul(le)</string>
     <string name="low">Faible</string>
     <string name="medium">Moyen</string>
     <string name="high">Elevé</string>
