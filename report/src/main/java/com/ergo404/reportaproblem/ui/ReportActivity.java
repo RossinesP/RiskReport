@@ -1,5 +1,6 @@
 package com.ergo404.reportaproblem.ui;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
@@ -34,6 +35,8 @@ import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.utils.Constants;
 import com.ergo404.reportaproblem.utils.EmailUtils;
+import com.ergo404.reportaproblem.utils.ReportUtils;
+import com.ergo404.reportaproblem.utils.async.ManagedAsyncTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +70,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(TAG, "onCreate called");
         mReport = new Report();
         setContentView(R.layout.activity_report);
 
@@ -119,19 +121,14 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
     }
 
     private void loadReport(Bundle savedInstanceState) {
-        Log.v(TAG, "loadReport called");
-
         if (savedInstanceState != null) {
-            Log.v(TAG, "Save instance state present !");
             String lastPicture = savedInstanceState.getString(EXTRA_LASTPICTURE);
             if (lastPicture != null) {
-                Log.v(TAG, "Last picture present");
                 mLastAskedPicture = Uri.parse(lastPicture);
             }
 
             Report savedReport = Report.getReport(savedInstanceState);
             if (!savedReport.isEmpty()) {
-                Log.v(TAG, "Loading report from the saved instance state, id = " + savedReport.sqlId);
                 setReport(savedReport);
             }
         }
@@ -140,7 +137,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
         if (callingIntent != null) {
             long sqliteId = callingIntent.getLongExtra(EXTRA_REPORTID, -1);
             if (sqliteId != -1) {
-                Log.v(TAG, "Intent with id: " + sqliteId);
                 new LoadReportTask().execute(sqliteId);
                 return;
             }
@@ -171,7 +167,8 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
                 dispatchTakePictureIntent();
                 return true;
             case R.id.action_sendreport:
-                new GenerateAndSendReport().execute(mReport);
+                sendReport();
+                //new GenerateAndSendReport().execute(mReport);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -219,20 +216,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            if (mReport != null && mLastAskedPicture != null) {
-                Log.v(TAG, "Adding a last Asked picture in onActivityResult");
-                if (mReport != null) {
-                    mReport.pictures.add(mLastAskedPicture.toString());
-                    new UpdateReportTask().execute(mReport);
-                    mPager.setCurrentItem(PICTURES_FRAGMENT_POS, true);
-                } else {
-                    mPictureToAdd = mLastAskedPicture;
-                }
-                mLastAskedPicture = null;
-            }
-        }*/
         if(resultCode == RESULT_OK) {
             if(requestCode == REQUEST_IMAGE_CAPTURE) {
                 final boolean isCamera;
@@ -287,8 +270,16 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-        // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(this, uri)) {
+        if (isKitKat) {
+            return getPathKitkat(uri);
+        } else {
+            return getPathLegacy(uri);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public String getPathKitkat(final Uri uri) {
+        if (DocumentsContract.isDocumentUri(this, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -298,8 +289,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
                 if ("primary".equalsIgnoreCase(type)) {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
-
-                // TODO handle non-primary volumes
             }
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
@@ -332,16 +321,21 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
                 return getDataColumn(this, contentUri, selection, selectionArgs);
             }
+        } else {
+            return getPathLegacy(uri);
         }
-        // MediaStore (and general)
-        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+        return null;
+    }
+
+    public String getPathLegacy(final Uri uri) {
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
             return getDataColumn(this, uri, null, null);
         }
         // File
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
         }
-
         return null;
     }
 
@@ -401,6 +395,10 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
      */
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    private void sendReport() {
+        ExportDialogFragment.exportReport(new Report(mReport), getSupportFragmentManager());
     }
 
     private void setReport(final Report report) {
@@ -466,28 +464,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
 
             }
         }
-
-
-        /*
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            if (Constants.createReportDir()) {
-                // Create the File where the photo should go
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                } catch (IOException ex) {
-                    // TODO
-                }
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    mLastAskedPicture = Uri.fromFile(photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                            mLastAskedPicture);
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
-            }
-        }*/
     }
 
     private File createImageFile() throws IOException {
@@ -583,48 +559,6 @@ public class ReportActivity extends FragmentActivity implements DescriptionFragm
                 // This page is way off-screen to the right.
                 view.setAlpha(0);
             }
-        }
-    }
-
-    private class GenerateAndSendReport extends AsyncTask<Report, Integer, Void> implements ExportDialogFragment.OnDismissListener {
-        private ExportDialogFragment exportDialogFragment;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            exportDialogFragment = ExportDialogFragment.getInstance();
-            exportDialogFragment.setNumReports(1);
-            exportDialogFragment.setDismissListener(this);
-            exportDialogFragment.show(getFragmentManager(), "exportDialog");
-        }
-
-        @Override
-        protected Void doInBackground(Report... reports) {
-            Constants.createReportDir();
-            Report report = reports[0];
-            String filePath = report.writeHTMLReport(Constants.REPORT_DIR.getAbsolutePath(), ReportActivity.this);
-
-            if (isCancelled()) return null;
-            EmailUtils.email(ReportActivity.this, "", "", getString(R.string.report_subject), "", filePath);
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            exportDialogFragment.setProgress(values[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            exportDialogFragment.dismiss();
-        }
-
-        @Override
-        public void onDismiss() {
-            if (BuildConfig.DEBUG) Log.v(TAG, "Progress dialog dismissed");
-            cancel(true);
         }
     }
 

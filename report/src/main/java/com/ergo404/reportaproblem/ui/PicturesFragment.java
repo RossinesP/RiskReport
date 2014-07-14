@@ -81,13 +81,13 @@ public class PicturesFragment extends Fragment {
         try {
             OnPictureUpdatedListener listener = (OnPictureUpdatedListener) activity;
         } catch (ClassCastException cce) {
-            Log.v(TAG, "Parent activity must implement OnPictureUpdatedListener");
+            Log.e(TAG, "Parent activity must implement OnPictureUpdatedListener");
             cce.printStackTrace();
         }
         try {
             ReportProvider provider = (ReportProvider) activity;
         } catch (ClassCastException cce) {
-            Log.v(TAG, "Parent activity must implement ReportProvider");
+            Log.e(TAG, "Parent activity must implement ReportProvider");
             cce.printStackTrace();
         }
     }

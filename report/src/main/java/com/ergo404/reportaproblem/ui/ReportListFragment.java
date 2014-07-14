@@ -33,6 +33,7 @@ import com.ergo404.reportaproblem.Report;
 import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.ui.adapters.ReportListAdapter;
 import com.ergo404.reportaproblem.utils.EmailUtils;
+import com.ergo404.reportaproblem.utils.ReportUtils;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
@@ -236,7 +237,7 @@ public class ReportListFragment extends ListFragment {
             }
         }
 
-        new GenerateAndSendReport().execute(selectedItems);
+        ExportDialogFragment.exportReports(selectedItems, getFragmentManager());
     }
 
     private void deleteSelectedItems() {
@@ -276,6 +277,7 @@ public class ReportListFragment extends ListFragment {
         menu.add(ContextMenu.NONE, ContextMenu.NONE, ContextMenu.NONE, R.string.delete_report);
     }
 
+    /*
     private class GenerateAndSendReport extends AsyncTask<ArrayList<Report>, Void, Void> {
         private final File mReportFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "RiskReport");
 
@@ -289,17 +291,16 @@ public class ReportListFragment extends ListFragment {
             createFolder();
             ArrayList<String> files = new ArrayList<String>();
             for (Report report : reports[0]) {
-                String filePath = report.writeHTMLReport(mReportFolder.getAbsolutePath(), getActivity());
+                String filePath = ReportUtils.writeHTMLReport(getActivity(), report, mReportFolder.getAbsolutePath());
                 files.add(filePath);
             }
 
             EmailUtils.email(getActivity(), "", "", getString(R.string.report_subject), "", files);
             return null;
         }
-    }
+    }*/
 
     private class UpdateListTask extends AsyncTask<Void, Void, ArrayList<Report>> {
-
         @Override
         protected ArrayList<Report> doInBackground(Void... params) {
             ReportDbHandler handler = ReportDbHandler.getInstance(getActivity());

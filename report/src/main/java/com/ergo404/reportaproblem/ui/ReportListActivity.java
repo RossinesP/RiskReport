@@ -26,8 +26,6 @@ public class ReportListActivity extends FragmentActivity implements ReportCreato
     @Override
     protected void onResume() {
         super.onResume();
-        Intent cleanPicturesService = new Intent(this, PictureCleanerService.class);
-        startService(cleanPicturesService);
     }
 
     @Override

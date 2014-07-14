@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.ergo404.reportaproblem.R;
 import com.ergo404.reportaproblem.Report;
+import com.ergo404.reportaproblem.utils.ReportUtils;
 
 /**
  * Created by pierrerossines on 09/06/2014.
@@ -84,12 +85,12 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
         try {
             OnUpdateReportListener listener = (OnUpdateReportListener) activity;
         } catch (ClassCastException exception) {
-            Log.v(TAG, "The parent activity must implement OnUpdateReportListener");
+            Log.e(TAG, "The parent activity must implement OnUpdateReportListener");
         }
         try {
             ReportProvider provider = (ReportProvider) activity;
         } catch (ClassCastException exception) {
-            Log.v(TAG, "The parent activity must implement ReportProvider");
+            Log.e(TAG, "The parent activity must implement ReportProvider");
         }
     }
 
@@ -156,7 +157,9 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
 
             @Override
             public void afterTextChanged(Editable s) {
-                getActivity().getActionBar().setTitle(s.toString());
+                if (getActivity() != null) {
+                    getActivity().getActionBar().setTitle(s.toString());
+                }
             }
         });
 
@@ -295,16 +298,16 @@ public class DescriptionFragment extends Fragment implements SeekBar.OnSeekBarCh
     }
 
     private void updateTitles() {
-        mRiskEmployeesTitle.setText(Report.getEmployeesString(getActivity(), mRiskEmployeesBar.getProgress()));
-        mRiskUsersTitle.setText(Report.getUsersString(getActivity(), mRiskUsersBar.getProgress()));
-        mRiskThirdTitle.setText(Report.getThirdString(getActivity(), mRiskThirdBar.getProgress()));
-        mWoundRiskTitle.setText(Report.getWoundString(getActivity(), mWoundRiskBar.getProgress()));
-        mSicknessTitle.setText(Report.getSicknessString(getActivity(), mSicknessRiskBar.getProgress()));
-        mPhysHardTitle.setText(Report.getPhysicalHardnessString(getActivity(), mRiskPhysHardnessBar.getProgress()));
-        mMentHardTitle.setText(Report.getMentalHardnessString(getActivity(), mRiskMentalHardnessBar.getProgress()));
-        mProbabilityTitle.setText(Report.getProbabilityString(getActivity(), mProbabilityBar.getProgress()));
-        mSolutionCostTitle.setText(Report.getFixCostString(getActivity(), mSolutionCost.getProgress()));
-        mSolutionEasinessTitle.setText(Report.getFixeasinessString(getActivity(), mSolutionEasiness.getProgress()));
+        mRiskEmployeesTitle.setText(ReportUtils.getEmployeesString(getActivity(), mRiskEmployeesBar.getProgress()));
+        mRiskUsersTitle.setText(ReportUtils.getUsersString(getActivity(), mRiskUsersBar.getProgress()));
+        mRiskThirdTitle.setText(ReportUtils.getThirdString(getActivity(), mRiskThirdBar.getProgress()));
+        mWoundRiskTitle.setText(ReportUtils.getWoundString(getActivity(), mWoundRiskBar.getProgress()));
+        mSicknessTitle.setText(ReportUtils.getSicknessString(getActivity(), mSicknessRiskBar.getProgress()));
+        mPhysHardTitle.setText(ReportUtils.getPhysicalHardnessString(getActivity(), mRiskPhysHardnessBar.getProgress()));
+        mMentHardTitle.setText(ReportUtils.getMentalHardnessString(getActivity(), mRiskMentalHardnessBar.getProgress()));
+        mProbabilityTitle.setText(ReportUtils.getProbabilityString(getActivity(), mProbabilityBar.getProgress()));
+        mSolutionCostTitle.setText(ReportUtils.getFixCostString(getActivity(), mSolutionCost.getProgress()));
+        mSolutionEasinessTitle.setText(ReportUtils.getFixeasinessString(getActivity(), mSolutionEasiness.getProgress()));
     }
 
     public void expand(final View frameView, final View layout) {
