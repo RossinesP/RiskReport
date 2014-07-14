@@ -36,7 +36,6 @@ import com.ergo404.reportaproblem.database.ReportDbHandler;
 import com.ergo404.reportaproblem.utils.Constants;
 import com.ergo404.reportaproblem.utils.EmailUtils;
 import com.ergo404.reportaproblem.utils.ReportUtils;
-import com.ergo404.reportaproblem.utils.async.ManagedAsyncTask;
 
 import java.io.File;
 import java.io.IOException;
